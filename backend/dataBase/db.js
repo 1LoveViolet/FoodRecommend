@@ -1,0 +1,4 @@
+//连接数据库
+const mysql = require("mysql");
+const config = require("./config").db;
+module.exports = mysql.createConnection(config);
