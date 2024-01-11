@@ -5,9 +5,13 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: {
-      userId: null,
-      userName: null,
+      user_id: null,
+      username: null,
+      password: null,
+      email: null,
+      avatar_url: null,
     },
+    token: null,
   },
   mutations: {
     setUserId(state, userId) {
@@ -23,6 +27,12 @@ export default new Vuex.Store({
     clearUserName(state) {
       state.user.userName = null;
     },
+    setUser(state) {
+      state.user = user;
+    },
+    setToken(state) {
+      state.token = token;
+    },
   },
   actions: {
     setUserId(context, userId) {
@@ -37,6 +47,13 @@ export default new Vuex.Store({
     },
     clearUserName(context) {
       context.commit("clearUserName");
+    },
+
+    setUser(context, user) {
+      context.commit("setUser", user);
+    },
+    setToken(context, token) {
+      context.commit("setToken", token);
     },
   },
   plugins: [

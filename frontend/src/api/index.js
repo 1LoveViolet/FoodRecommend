@@ -1,4 +1,4 @@
-import axios from "./axios";
+import axios from "network/axios";
 //地址管理
 export function getAllUsers() {
   return axios({
@@ -12,9 +12,9 @@ export function getAllUsers() {
   });
 }
 
-export function login() {
+export function login(data) {
   return axios({
-    url: "/api/alluser",
+    url: "/api/login",
     method: "POST",
     headers: {
       "Content-Type": "application/json",

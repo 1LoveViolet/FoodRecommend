@@ -1,0 +1,185 @@
+@media screen and (max-width: 720px) {
+  :root {
+    font-size: 720px / 35;
+  }
+
+  /* {
+    position: sticky;
+    top: 0px;
+    width: 100%;
+    height: 4.18055556rem;
+    transition: all 0.3s;
+  } */
+  .headerbox {
+    position: sticky;
+    top: 0px;
+    width: 100%;
+    height: 4.18055556rem;
+    transition: all 0.3s;
+    width: 100%;
+  }
+
+  .box {
+
+    width: 100%;
+    height: 4.18055556rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .logo {
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+
+
+  .logoimg {
+    width: 85%;
+    height: 85%;
+    margin: auto;
+  }
+
+  .switch {
+    display: block;
+    position: absolute;
+    top: 20%;
+    right: 0;
+    z-index: 10;
+    /* padding: 20px 30px 10px 10px; */
+    color: #ffffff;
+    cursor: pointer;
+    text-transform: uppercase;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    z-index: 99;
+  }
+
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 9px;
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-top: 2px solid #000000;
+    border-radius: 1px;
+    transition: border-color 1s;
+  }
+
+  .switch::before {
+    content: "";
+    position: absolute;
+    top: 16px;
+    right: 9px;
+    display: block;
+    width: 22px;
+    height: 2px;
+    padding: 2px 0;
+    border-top: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    border-radius: 1px;
+    transition: border-color 1s;
+  }
+
+  .switch.active {
+    background: #ffffff;
+  }
+
+  .switch.active::before,
+  .switch.active::after {
+    border-color: #000;
+    z-index: 4;
+    transition: border-color 1s;
+  }
+
+  .switch.active::before {
+    right: 8px;
+    border-top: 2px solid #000;
+    border-bottom: 0px solid #000;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+
+  .switch.active::after {
+    top: 16px;
+    border-top: 2px solid #000;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  .nav {
+    display: flex;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+    flex: 1;
+    text-align: center;
+    font-size: 1.333rem;
+    line-height: normal;
+    letter-spacing: 0px;
+    z-index: 2;
+  }
+
+  .nav-item {
+    width: 100%;
+    background-color: #ffffff;
+    padding-bottom: 0.5rem;
+  }
+
+  .units-and-links {
+    margin-left: 10px;
+    margin-top: 35px;
+  }
+
+  .units-and-links-title {
+    width: 50%;
+  }
+
+  .footer-nav-box-unit {
+    width: 50%;
+    height: 20%;
+    margin-bottom: 5px;
+  }
+
+  .haiguan {
+    margin-bottom: 0px;
+  }
+
+  .copyright-and-business-license {
+    width: 86%;
+    text-align: center;
+  }
+
+  .copyright-and-business-license-a2 {
+    margin-left: 0px;
+  }
+
+  .logo-a {
+    justify-content: center;
+  }
+
+  .copyright-and-business-license-a2 {
+    /* display: inline-block;
+    width: 15%; */
+  }
+}
+
+/* 在 600 像素或更小的屏幕上，将背景色设置为橄榄色 */
+@media screen and (max-width: 620px) {
+  :root {
+    font-size: 620px / 35;
+  }
+}

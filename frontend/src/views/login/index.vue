@@ -38,12 +38,14 @@
 </template>
 
 <script>
-import { getAllUsers } from "network/edit";
+import { login } from "api/index";
 export default {
   data() {
     return {
       username: [],
       password: [],
+      token: null,
+      user: {},
     };
   },
   mounted() {
@@ -52,9 +54,16 @@ export default {
   },
   methods: {
     login() {
-      getAllUsers()
+      let data = { username: this.username, password: this.password };
+      login(data)
         .then((response) => {
           console.log(response);
+          if (response.code == "200") {
+            (this.user = response.data), (this.token = response.token);
+            this.$store.commit("setUser", this.user);
+            this.$store.commit("setToken", this.token);
+            this.$router.push("/home");
+          }
         })
         .catch(function (error) {
           console.log(error);
