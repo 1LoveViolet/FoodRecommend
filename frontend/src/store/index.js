@@ -12,8 +12,12 @@ export default new Vuex.Store({
       avatar_url: null,
     },
     token: null,
+    isLogin: false,
   },
   mutations: {
+    changeisLogin(state) {
+      state.isLogin = !state.isLogin;
+    },
     setUserId(state, userId) {
       state.user.userId = userId;
     },
@@ -27,14 +31,23 @@ export default new Vuex.Store({
     clearUserName(state) {
       state.user.userName = null;
     },
-    setUser(state) {
+    setUser(state, user) {
       state.user = user;
     },
-    setToken(state) {
+    clearUser(state) {
+      state.user = null;
+    },
+    setToken(state, token) {
       state.token = token;
+    },
+    clearToken(state) {
+      state.token = null;
     },
   },
   actions: {
+    changeisLogin(context) {
+      context.commit("changeisLogin");
+    },
     setUserId(context, userId) {
       context.commit("setUserId", userId);
     },
@@ -54,6 +67,12 @@ export default new Vuex.Store({
     },
     setToken(context, token) {
       context.commit("setToken", token);
+    },
+    clearUser(context) {
+      context.commit("clearUser");
+    },
+    clearToken(context) {
+      context.commit("clearToken");
     },
   },
   plugins: [

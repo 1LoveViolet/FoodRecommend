@@ -55,13 +55,17 @@ export default {
   methods: {
     login() {
       let data = { username: this.username, password: this.password };
-      login(data)
+      login(data) //封装好的login()方法
         .then((response) => {
           console.log(response);
+
           if (response.code == "200") {
             (this.user = response.data), (this.token = response.token);
-            this.$store.commit("setUser", this.user);
-            this.$store.commit("setToken", this.token);
+            this.$store.dispatch("setUser", this.user);
+            this.$store.dispatch("setToken", this.token);
+            console.log("user", this.$store.state.user);
+            console.log("token", this.$store.state.token);
+            this.$store.dispatch("changeisLogin");
             this.$router.push("/home");
           }
         })

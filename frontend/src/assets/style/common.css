@@ -9,7 +9,7 @@ header {
     margin: auto;
     width: 100%;
     height: 86px;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
     z-index: 999;
 }
 
@@ -20,7 +20,8 @@ body {
 
 .headerbox {
     margin: auto;
-    width: 1440px;
+    /* width: 1440px; */
+    width: 1552px;
     height: 86px;
     display: flex;
     justify-content: space-between;
@@ -42,8 +43,8 @@ body {
 }
 
 .logoimg {
-    width: 300px;
-    height: 65px;
+    width: 320px;
+    height: 65px
 }
 
 .icon {
@@ -52,7 +53,8 @@ body {
 }
 
 .nav {
-    width: 768px;
+    /* width: 768px; */
+    width: 880px;
     height: 70px;
     margin-top: 8px;
 }
@@ -111,6 +113,23 @@ body {
     justify-content: center;
 }
 
+
+.banner {
+    /* width: 1440px;
+      height: 380px; */
+    display: flex;
+    margin: auto;
+    justify-content: center;
+    align-items: center;
+    /* padding-top: 86px; */
+}
+
+.banner img {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+}
+
 footer {
     background: #353535;
 }
@@ -147,6 +166,10 @@ footer {
     align-items: center;
 }
 
+.units-and-links-title {
+    width: 33.333%;
+}
+
 .units,
 .links,
 .allunit {
@@ -174,13 +197,13 @@ footer {
     font-size: 14px;
     font-family: PingFangSC-Regular, PingFang SC;
     font-weight: 400;
-    color: #ffffff;
+    color: #FFFFFF;
     line-height: 20px;
     margin-bottom: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    flex: 0 0 auto;
+    flex: 0 0 auto
 }
 
 .footer-nav-box-unit {
@@ -189,14 +212,14 @@ footer {
     font-size: 12px;
     font-family: PingFangSC-Regular, PingFang SC;
     font-weight: 400;
-    color: #ffffff;
+    color: #FFFFFF;
     line-height: 17px;
     /* margin-bottom: 12px; */
     /* margin-right: 60px; */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    flex: 0 0 auto;
+    flex: 0 0 auto
 }
 
 .haiguan {
@@ -222,7 +245,7 @@ footer {
     height: 20px;
     font-size: 14px;
     font-weight: 400;
-    color: #ffffff;
+    color: #FFFFFF;
     line-height: 20px;
 }
 
@@ -240,14 +263,14 @@ footer {
     height: 20px;
     font-size: 14px;
     font-weight: 400;
-    color: #b6b6b6;
+    color: #B6B6B6;
     line-height: 20px;
     margin: auto;
     margin-top: 20px;
 }
 
 .copyright-and-business-license a {
-    color: #b6b6b6;
+    color: #B6B6B6;
 }
 
 .copyright-and-business-license-a2 {
@@ -259,3 +282,92 @@ footer {
       border-radius: 5px;
       transition: all 0.5s; */
 }
+
+.nav-item-menu {
+    float: left;
+    width: 112px;
+    display: flex;
+    /* padding-top: 20px; */
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 99999999999;
+}
+
+.nav-item-enter {
+    width: 112px;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-item {
+    width: 112px;
+
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    /* display: flex; */
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-item div {
+    width: 106px;
+    float: left;
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 30px;
+    color: #333333;
+    transition: background 0.6s, color 0.6s;
+    cursor: pointer;
+}
+
+
+.mobile-item {
+    display: none;
+}
+
+.nav-item div {
+    width: 106px;
+    height: 30px;
+    float: left;
+    display: inline-block;
+    text-align: center;
+    margin: auto;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 30px;
+    color: #333333;
+    transition: background 0.6s, color 0.6s;
+    cursor: pointer;
+}
+
+.nav-item div:hover {
+    background: #3381f5;
+    color: #ffffff;
+}
+
+.menu-item div:hover {
+    background: #3381f5;
+    color: #ffffff;
+}
+
+
+
+/* html,
+  body {
+    overflow: hidden;
+    height: 100%;
+  } */

@@ -4,26 +4,34 @@
       <img src="~assets/images/logo.png" class="logoimg" alt="" />
     </div>
     <div class="nav">
-      <div class="nav-item-index nav-item" v-show="!isLogin">
-        <a href="./index.html">登录/注册</a>
+      <div class="nav-item-menu" v-show="this.$store.state.isLogin">
+        <div class="nav-item">
+          <div>{{ user.username }}</div>
+        </div>
+        <div class="menu-item" v-show="this.$store.state.isLogin">
+          <div>个人信息</div>
+          <div>我的收藏</div>
+          <div>我的账单</div>
+          <div @click="loginOut">退出注销</div>
+        </div>
       </div>
-      <div class="nav-item-index nav-item" v-if="isLogin">
-        <a href="./index.html">{{ user.username }}</a>
+      <div class="nav-item" v-if="!this.$store.state.isLogin" @click="toLogin">
+        <div>登录/注册</div>
       </div>
       <div class="nav-item-intro nav-item">
-        <a href="./testAreaIntroduction.html">个人中心</a>
+        <div>个人中心</div>
       </div>
       <div class="nav-item">
-        <a href="./entryGuide.html">入驻指引</a>
+        <div>入驻指引</div>
       </div>
       <div class="nav-item">
-        <a href="./customsClearanceServices.html">商务服务</a>
+        <div>商务服务</div>
       </div>
       <div class="nav-item">
-        <a href="./news.html">美食排行</a>
+        <div>美食排行</div>
       </div>
       <div class="nav-item">
-        <a href="./comprehensiveServices.html">帮助中心</a>
+        <div>帮助中心</div>
       </div>
 
       <!-- <div class="nav-item">
@@ -40,56 +48,37 @@ export default {
   components: {},
   data() {
     return {
-      user: null,
-      isLogin: false,
+      user: {},
     };
   },
-  mounted() {
-    // $(document).ready(function () {
-    //   var url = window.location.href;
-    //   var url1;
-    //   $(".nav a").each(function () {
-    //     url1 = $(this).attr("href");
-    //     console.log(url1);
-    //     console.log(url);
-    //     console.log($(".nav a"));
-    //     if (url.indexOf(url1.slice(2, url1.length)) != -1) {
-    //       $(this).addClass("active");
-    //     }
-    //     if (url.indexOf("settled-enterprise.html") != -1) {
-    //       console.log("入驻企业");
-    //       $(".nav a").eq(0).addClass("active");
-    //     }
-    //     if (url.indexOf("settled-enterprise-details.html") != -1) {
-    //       console.log("入驻企业");
-    //       $(".nav a").eq(0).addClass("active");
-    //     }
-    //   });
-    // });
-    var flag = true;
-    $(".switch").click(function () {
-      if (flag) {
-        $(".switch").addClass("active");
-        $(".nav").show();
-        flag = false;
-      } else {
-        $(".switch").removeClass("active");
-        $(".nav").hide();
-        flag = true;
-      }
-    });
-    if ($(window).width() <= 720) {
-      $(".nav").hide();
+  created() {
+    if (this.$store.state.user) {
+      this.user = this.$store.state.user[0];
+    } else {
+      this.user.username = "登录/注册";
     }
-    $(window).resize(function () {
-      //   console.log($(window).width());
-      if ($(window).width() <= 720) {
-        $(".nav").hide();
-      } else {
-        $(".nav").show();
-        $(".switch").removeClass("active");
-      }
+  },
+  mounted() {
+    // $(".menu-item").css("display", "flex");
+    $(".menu-item").css("display", "none");
+    //获取类.div1节点 div;设置鼠标经过节点mouseover
+    $(".nav-item-menu").mouseover(function () {
+      $(".menu-item").css("display", "flex");
     });
+    //获取类.div1节点 div;设置鼠标离开节点mouseout
+    $(".nav-item-menu").mouseout(function () {
+      $(".menu-item").css("display", "none");
+    });
+  },
+  methods: {
+    toLogin() {
+      this.$router.push("/login");
+    },
+    loginOut() {
+      this.$store.dispatch("clearUser");
+      this.$store.dispatch("clearToken");
+      this.$store.dispatch("changeisLogin");
+    },
   },
 };
 </script>

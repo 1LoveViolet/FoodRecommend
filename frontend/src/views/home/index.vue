@@ -1,24 +1,7 @@
 <template>
   <div>
     <myheader></myheader>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
-    <h1>1</h1>
+    <div class="content"></div>
     <myfooter></myfooter>
   </div>
 </template>
@@ -35,5 +18,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.content {
+  width: 1000px;
+  height: 1000px;
+  background-color: aqua;
+  margin: auto;
+}
 </style>
