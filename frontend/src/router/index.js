@@ -20,6 +20,11 @@ const router = new VueRouter({
     // 	meta: { requireAuth: false },
     // },
     {
+      path: "/",
+      // redirect: "/edit/basic",
+      component: Home,
+    },
+    {
       path: "/login",
       component: Login,
     },
@@ -27,11 +32,7 @@ const router = new VueRouter({
       path: "/register",
       component: Register,
     },
-    {
-      path: "/",
-      // redirect: "/edit/basic",
-      component: Login,
-    },
+
     {
       path: "/home",
       component: Home,
@@ -98,24 +99,29 @@ const router = new VueRouter({
   mode: "history",
 });
 
-// router.beforeEach((to, from, next) => {
-//   const userId = router.app.$store.state.user.userId;
+router.beforeEach((to, from, next) => {
+  const token = router.app.$store.state.token;
 
-//   if (to.path === "/login" || to.path === "/register" || to.path === "/") {
-//     // 如果是登录或注册页面，直接允许访问
-//     next();
-//   } else if (userId) {
-//     // 用户已登录，允许导航到目标路由
-//     next();
-//   } else {
-//     // 用户未登录，重定向到登录页面或其他处理方式
-//     Vue.prototype.$alert("请先登录", "提示", {
-//       confirmButtonText: "确定",
-//       type: "warning",
-//       callback: () => {
-//         next("/login");
-//       },
-//     });
-//   }
-// });
+  if (
+    to.path === "/login" ||
+    to.path === "/register" ||
+    to.path === "/home" ||
+    to.path === "/"
+  ) {
+    // 如果是登录或注册页面，直接允许访问
+    next();
+  } else if (token) {
+    // 用户已登录，允许导航到目标路由
+    next();
+  } else {
+    // 用户未登录，重定向到登录页面或其他处理方式
+    Vue.prototype.$alert("请先登录", "提示", {
+      confirmButtonText: "确定",
+      type: "warning",
+      callback: () => {
+        next("/login");
+      },
+    });
+  }
+});
 export default router;

@@ -1,25 +1,44 @@
 <template>
   <div class="headerbox">
     <div class="logo">
-      <img src="~assets/images/logo.png" class="logoimg" alt="" />
+      <img
+        src="~assets/images/logo.png"
+        class="logoimg"
+        alt=""
+        @click="toHome"
+      />
     </div>
     <div class="nav">
-      <div class="nav-item-menu" v-show="this.$store.state.isLogin">
+      <div class="nav-item-menu-user" v-show="this.$store.state.isLogin">
         <div class="nav-item">
           <div>{{ user.username }}</div>
         </div>
-        <div class="menu-item" v-show="this.$store.state.isLogin">
-          <div>个人信息</div>
-          <div>我的收藏</div>
-          <div>我的账单</div>
-          <div @click="loginOut">退出注销</div>
+        <div class="menu-item-user">
+          <div class="avatar">
+            <img :src="this.userImage" alt="" />
+          </div>
+          <div class="menu-item-user-content">
+            <div class="username">{{ user.username }}</div>
+            <div class="fansandreview">
+              <div class="fansnum">粉丝：6</div>
+              <div class="reviewnum">评论：7</div>
+            </div>
+            <div @click="loginOut" class="loginOut">退出</div>
+          </div>
         </div>
       </div>
       <div class="nav-item" v-if="!this.$store.state.isLogin" @click="toLogin">
         <div>登录/注册</div>
       </div>
-      <div class="nav-item-intro nav-item">
-        <div>个人中心</div>
+      <div class="nav-item-menu">
+        <div class="nav-item">
+          <div>个人中心</div>
+        </div>
+        <div class="menu-item">
+          <div>个人信息</div>
+          <div>我的收藏</div>
+          <div>我的账单</div>
+        </div>
       </div>
       <div class="nav-item">
         <div>入驻指引</div>
@@ -44,11 +63,13 @@
 
 <script>
 import $ from "jquery";
+import { getAvatar } from "api/user";
 export default {
   components: {},
   data() {
     return {
       user: {},
+      userImage: null,
     };
   },
   created() {
@@ -69,8 +90,25 @@ export default {
     $(".nav-item-menu").mouseout(function () {
       $(".menu-item").css("display", "none");
     });
+
+    $(".menu-item-user").css("display", "none");
+    $(".nav-item-menu-user").mouseover(function () {
+      $(".menu-item-user").css("display", "flex");
+    });
+    //获取类.div1节点 div;设置鼠标离开节点mouseout
+    $(".nav-item-menu-user").mouseout(function () {
+      $(".menu-item-user").css("display", "none");
+    });
+    getAvatar(this.$store.state.user[0].user_id).then((res) => {
+      // console.log(res);
+      const data = res.data;
+      this.userImage = data.avatar_url;
+    });
   },
   methods: {
+    toHome() {
+      this.$router.go(0);
+    },
     toLogin() {
       this.$router.push("/login");
     },

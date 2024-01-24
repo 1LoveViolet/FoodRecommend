@@ -7,7 +7,7 @@ const cors = require("cors");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-
+var goodsRouter = require("./routes/goods");
 var app = express();
 // 使用cors中间件
 app.use(
@@ -22,10 +22,12 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "")));
 
 app.use("/", indexRouter);
 app.use("/api", usersRouter);
+app.use("/api", goodsRouter);
 
 // app.use("/user", api);
 

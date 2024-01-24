@@ -364,7 +364,79 @@ footer {
     color: #ffffff;
 }
 
+.nav-item-menu-user {
+    float: left;
+    width: 112px;
+    display: flex;
+    /* padding-top: 20px; */
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 99999999999;
+    background-color: #ffffff;
+}
 
+.avatar {
+    /* width: 50px;
+    height: 50px; */
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #ffffff;
+}
+
+.avatar img {
+    width: 50px;
+    height: 50px;
+}
+
+.menu-item-user {
+    width: 240px;
+    height: 120px;
+    /* background-color: #3381f5; */
+    padding-left: 128px;
+    border-radius: 15px;
+    /* margin-bottom: 10px; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-item-user div>div:hover {
+    color: #f63;
+}
+
+.menu-item-user-content {
+    height: 100%;
+    background-color: #ffffff;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 10px;
+    /* margin-bottom: 10px; */
+}
+
+.username {
+    margin-top: 10px;
+}
+
+.fansandreview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fansnum {
+    margin-right: 20px;
+}
+
+.loginOut {
+    margin-bottom: 10px;
+    cursor: pointer;
+}
 
 /* html,
   body {

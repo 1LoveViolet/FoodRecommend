@@ -3,6 +3,7 @@ var router = express.Router();
 const connection = require("../dataBase/db"); // 获取连接实例
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
+const uploadAvatar = require("../multer/upload");
 //注册页面
 router.get("/reg", (req, res) => {
   res.render("reg");
@@ -76,6 +77,73 @@ router.post("/login", (req, res) => {
       });
     }
   });
+});
+
+//获取用户头像
+router.get("/getAvatar/:user_id", (req, res) => {
+  const user_id = req.params.user_id;
+  let sql = `select avatar_url from users  where user_id= "${user_id}"`;
+  connection.query(sql, (err, result) => {
+    if (err) {
+      res.status(500).send({
+        code: "412",
+        msg: "查找用户头像错误",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.send({
+        code: "200",
+        msg: "查找成功",
+        data: {
+          user_id: user_id,
+          avatar_url: result[0].avatar_url,
+          // jsonData: jsonData,
+        },
+      });
+    }
+  });
+});
+//上传头像
+router.post("/uploadAvatar", async (req, res) => {
+  try {
+    const imageUrl = await uploadAvatar(req, res);
+    const user_id = req.body.user_id;
+    // const jsonData = req.body;
+    var sql = `UPDATE users SET avatar_url="${imageUrl}" WHERE user_id="${user_id}"`;
+    // var sql = `UPDATE users SET avatar_url=? WHERE user_id=?`;
+    // let where_value = [req.body.user_id, await uploadAvatar(req, res)];
+    connection.query(sql, function (err, result) {
+      if (err) {
+        res.status(500).send({
+          code: "412",
+          msg: "添加头像失败",
+          data: null,
+          err: err,
+          req: req.body,
+          avatar_url: imageUrl,
+        });
+      } else {
+        res.send({
+          code: "200",
+          msg: "添加头像成功",
+          data: {
+            user_id: user_id,
+            avatar_url: imageUrl,
+            // jsonData: jsonData,
+          },
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).send({
+      code: "500",
+      msg: "添加头像失败",
+      data: null,
+      err: error,
+    });
+  }
 });
 
 module.exports = router;
