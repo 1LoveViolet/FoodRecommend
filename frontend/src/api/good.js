@@ -36,3 +36,26 @@ export function searchRestaurantReviews(data) {
     data: data,
   });
 }
+//查询商家的种类
+export function searchRestaurantCategory() {
+  return axios({
+    url: "/api/searchRestaurantCategory",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+//查询种类的副种类
+export function searchRestaurantCuisine(data) {
+  return axios({
+    url: "/apiarchRestaurantCuisine",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+    data: data,
+  });
+}

@@ -89,4 +89,55 @@ router.post("/searchRestaurantReviews", (req, res) => {
   });
 });
 
+//查询商家表的菜品种
+router.get("/searchRestaurantCategory", (req, res) => {
+  // 使用商家ID查询对应的菜品
+  const sql = `
+    SELECT category
+    FROM restaurants;
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
+
+//查询商家表的菜品种的副种类
+router.post("/searchRestaurantCuisine", (req, res) => {
+  // 使用商家ID查询对应的菜品
+  const category = req.body.category;
+  const sql = `
+    SELECT cuisine
+    FROM restaurants where category="${category}";
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
+
 module.exports = router;

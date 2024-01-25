@@ -19,12 +19,16 @@ body {
 }
 
 .headerbox {
+    position: sticky;
+    top: 0px;
+    background-color: #f8f8f8;
     margin: auto;
     /* width: 1440px; */
     width: 1552px;
     height: 86px;
     display: flex;
     justify-content: space-between;
+    z-index: 9999;
 }
 
 .switch {
@@ -375,14 +379,16 @@ footer {
     justify-content: space-between;
     align-items: center;
     z-index: 99999999999;
-    background-color: #ffffff;
 }
 
 .avatar {
     /* width: 50px;
     height: 50px; */
-    padding: 10px;
-    border-radius: 15px;
+    height: 120px;
+    padding: 0px 10px;
+    /* border-radius: 15px; */
+    display: flex;
+    align-items: center;
     background-color: #ffffff;
 }
 
@@ -399,8 +405,9 @@ footer {
     border-radius: 15px;
     /* margin-bottom: 10px; */
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    /* background-color: #ffffff; */
 }
 
 .menu-item-user div>div:hover {
