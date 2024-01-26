@@ -21,7 +21,14 @@
       :categorys="this.categoryList"
       @tabClick="tabClick(arguments)"
     ></TabControl>
-    <GoodsList :goods="showGoods"></GoodsList>
+    <Cuisine
+      v-show="this.currentType !== '不限'"
+      ref="tabControl3"
+      class=""
+      :cuisines="this.cuisineList"
+      @cuisineClick="cuisineClick(arguments)"
+    ></Cuisine>
+    <GoodsList :goods="this.showGoods"></GoodsList>
   </div>
 </template>
 
@@ -30,17 +37,28 @@ const TabControl = () =>
   import("components/content/components/tabControl/index.vue");
 const GoodsList = () =>
   import("components/content/components/goodList/index.vue");
-import { searchRestaurantCategory } from "api/good";
+const Cuisine = () =>
+  import("components/content/components/cuisineList/index.vue");
+import {
+  searchRestaurantCuisine,
+  searchRestaurantCategory,
+  searchRestaurantsByCategory,
+  searchRestaurantsByCuisine,
+  searchAllRestaurants,
+} from "api/good";
 export default {
   components: {
     TabControl,
     GoodsList,
+    Cuisine,
   },
   data() {
     return {
       input: null,
       categoryList: [],
-      goods: {},
+      cuisineList: [],
+      showGoods: [],
+      currentType: null,
       // goods: {
       //   pop: { page: 0, list: [] },
       //   new: { page: 0, list: [] },
@@ -50,21 +68,20 @@ export default {
   },
   created() {
     searchRestaurantCategory().then((res) => {
-      console.log(res);
       let ArrCategory = this.uniqueFunc(res.data, "category");
-      console.log(ArrCategory);
+      this.categoryList.push("不限");
       ArrCategory.forEach((item) => {
         this.categoryList.push(item.category);
       });
       console.log(this.categoryList);
+      this.getCuisine(this.categoryList[0]);
+      this.currentType = "不限";
     });
   },
-  computed: {
-    // showGoods() {
-    //   return this.goods[this.currentType].list;
-    // },
+  computed: {},
+  mounted() {
+    this.getAllRestaurantInfo();
   },
-  mounted() {},
   methods: {
     //对象数组去重
     uniqueFunc(arr, uniId) {
@@ -73,15 +90,60 @@ export default {
         (item) => !res.has(item[uniId]) && res.set(item[uniId], 1)
       );
     },
+    getRestaurantInfoByCategory() {
+      searchRestaurantsByCategory(this.currentType).then((res) => {
+        console.log(res);
+        this.showGoods = res.data;
+        console.log(this.showGoods);
+      });
+    },
+    getRestaurantInfoByCuisine() {
+      searchRestaurantsByCuisine(this.currentType).then((res) => {
+        console.log(res);
+        this.showGoods = res.data;
+        console.log(this.showGoods);
+      });
+    },
+    getAllRestaurantInfo() {
+      searchAllRestaurants().then((res) => {
+        console.log(res);
+        this.showGoods = res.data;
+        console.log(this.showGoods);
+      });
+    },
+    //获取副种类
+    getCuisine(canshu) {
+      searchRestaurantCuisine(canshu).then((res) => {
+        let ArrCuisine = this.uniqueFunc(res.data, "cuisine");
+        this.cuisineList = [];
+        ArrCuisine.forEach((item) => {
+          this.cuisineList.push(item.cuisine);
+        });
+        console.log(this.cuisineList);
+      });
+    },
     //事件监听相关的代码
     tabClick(argus) {
-      console.log(argus[0]);
       const { item, index } = argus[0];
       console.log(item);
-      console.log(index);
       this.currentType = item;
+      console.log("this.currentType:  ", this.currentType);
       this.$refs.tabControl2.currentIndex = index;
+      this.getCuisine(this.currentType);
+      if (this.currentType == "不限") {
+        this.getAllRestaurantInfo();
+      } else {
+        this.getRestaurantInfoByCategory();
+      }
       // this.$refs.tabControl1.currentIndex = index;
+    },
+    cuisineClick(argus) {
+      const { item, index } = argus[0];
+      console.log(item);
+      this.currentType = item;
+      console.log("this.currentType:  ", this.currentType);
+      this.$refs.tabControl3.currentIndex = index;
+      this.getRestaurantInfoByCuisine();
     },
   },
 };
@@ -91,7 +153,7 @@ export default {
 .content-head {
   width: 100%;
   display: flex;
-  background-color: blueviolet;
+  /* background-color: blueviolet; */
   justify-content: space-between;
   margin-top: 20px;
 }

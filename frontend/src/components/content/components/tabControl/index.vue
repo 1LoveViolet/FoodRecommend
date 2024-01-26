@@ -10,24 +10,13 @@
       >
         <span :class="{ active: index === currentIndex }">{{ item }}</span>
       </div>
-      <Cuisine
-        ref="tabControl3"
-        class=""
-        :cuisines="this.cuisineList"
-        @tabClick="tabClick(arguments)"
-      ></Cuisine>
     </div>
   </div>
 </template>
   
   <script>
-const Cuisine = () =>
-  import("components/content/components/cuisineList/index.vue");
-import { searchRestaurantCuisine } from "api/good";
 export default {
-  components: {
-    Cuisine,
-  },
+  components: {},
   props: {
     categorys: {
       type: Array,
@@ -42,11 +31,7 @@ export default {
       categoryList: [],
     };
   },
-  created() {
-    searchRestaurantCuisine(categorys[0]).then((res) => {
-      console.log(res);
-    });
-  },
+  created() {},
   methods: {
     itemclick(item, index) {
       this.currentIndex = index;

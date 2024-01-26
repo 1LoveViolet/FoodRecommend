@@ -3,7 +3,7 @@
     <myheader></myheader>
     <div class="content">
       <mycontent></mycontent>
-      <goodsList></goodsList>
+      <!-- <goodsList></goodsList> -->
     </div>
     <myfooter></myfooter>
   </div>
@@ -13,14 +13,14 @@
 const myheader = () => import("components/header/index.vue");
 const myfooter = () => import("components/footer/index.vue");
 const mycontent = () => import("components/content/index.vue");
-const goodsList = () => import("components/productList/index.vue");
+// const goodsList = () => import("components/productList/index.vue");
 export default {
   name: "home",
   components: {
     myheader,
     myfooter,
     mycontent,
-    goodsList,
+    // goodsList,
   },
 };
 </script>
@@ -28,8 +28,9 @@ export default {
 <style scoped>
 .content {
   width: 1000px;
-  height: 1000px;
-  background-color: aqua;
+  height: 100%;
+  /* background-color: aqua; */
   margin: auto;
+  background: #f6f6f6;
 }
 </style>

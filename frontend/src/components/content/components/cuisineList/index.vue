@@ -32,7 +32,7 @@ export default {
   methods: {
     itemclick(item, index) {
       this.currentIndex = index;
-      this.$emit("tabClick", { item, index });
+      this.$emit("cuisineClick", { item, index });
     },
   },
 };
@@ -44,11 +44,11 @@ export default {
 }
 .navigation {
   display: flex;
-  border: 1px solid #f0f0f0;
-  padding: 18px 0 0 19px;
-  background: #fff;
+  padding: 18px 0 0 55px;
   zoom: 1;
   font-size: 12px;
+  background-color: #fafafa;
+  border: solid 1px #eee;
 }
 .nav-cuisine {
   display: flex;

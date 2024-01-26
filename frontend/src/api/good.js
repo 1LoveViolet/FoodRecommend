@@ -1,5 +1,18 @@
 import axios from "network/axios";
-//首页展示商家信息   参数category，name
+
+//全查商家
+export function searchAllRestaurants() {
+  return axios({
+    url: `/api/searchAllRestaurants`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+
+//首页展示商家信息  搜索框或主分类 参数category，name
 export function searchRestaurants(data) {
   return axios({
     url: "/api/searchRestaurants",
@@ -9,6 +22,28 @@ export function searchRestaurants(data) {
       "Access-Control-Allow-Origin": "*",
     },
     data: data,
+  });
+}
+//首页展示商家信息  主分类
+export function searchRestaurantsByCategory(category) {
+  return axios({
+    url: `/api/searchRestaurantsByCategory/${category}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+//首页展示商家信息  副分类
+export function searchRestaurantsByCuisine(cuisine) {
+  return axios({
+    url: `/api/searchRestaurantsByCuisine/${cuisine}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
   });
 }
 
@@ -48,14 +83,13 @@ export function searchRestaurantCategory() {
   });
 }
 //查询种类的副种类
-export function searchRestaurantCuisine(data) {
+export function searchRestaurantCuisine(category) {
   return axios({
-    url: "/apiarchRestaurantCuisine",
-    method: "POST",
+    url: `/api/searchRestaurantCuisine/${category}`,
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
     },
-    data: data,
   });
 }

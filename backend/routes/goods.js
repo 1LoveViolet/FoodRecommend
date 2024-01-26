@@ -6,7 +6,28 @@ const jwt = require("jsonwebtoken");
 
 // 假设已有数据库连接池 connection，如果没有，需要先配置数据库连接
 
-//首页展示商家信息
+//全查商家
+//根据主分类查询商家
+router.get("/searchAllRestaurants", (req, res) => {
+  const sql = `SELECT * FROM restaurants`;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
+//首页展示商家信息 搜索框或主分类
 router.post("/searchRestaurants", (req, res) => {
   const category = req.body.category;
   const dishName = req.body.name;
@@ -30,7 +51,48 @@ router.post("/searchRestaurants", (req, res) => {
     }
   });
 });
-
+//根据主分类查询商家
+router.get("/searchRestaurantsByCategory/:category", (req, res) => {
+  const category = req.params.category;
+  const sql = `SELECT * FROM restaurants WHERE category="${category}"`;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
+//根据副分类查询商家
+router.get("/searchRestaurantsByCuisine/:cuisine", (req, res) => {
+  const cuisine = req.params.cuisine;
+  const sql = `SELECT * FROM restaurants WHERE cuisine="${cuisine}"`;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
 //通过商家id查询对应的菜品信息
 router.post("/searchRestaurantDishes", (req, res) => {
   const restaurantId = req.body.restaurantId;
@@ -115,9 +177,9 @@ router.get("/searchRestaurantCategory", (req, res) => {
 });
 
 //查询商家表的菜品种的副种类
-router.post("/searchRestaurantCuisine", (req, res) => {
+router.get("/searchRestaurantCuisine/:category", (req, res) => {
   // 使用商家ID查询对应的菜品
-  const category = req.body.category;
+  const category = req.params.category;
   const sql = `
     SELECT cuisine
     FROM restaurants where category="${category}";
