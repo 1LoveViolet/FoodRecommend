@@ -14,11 +14,12 @@ const storage = multer.diskStorage({
     if (
       file.mimetype === "image/jpeg" ||
       file.mimetype === "image/png" ||
+      file.mimetype === "image/jpg" ||
       file.mimetype === "image/gif"
     ) {
       cb(null, handlePath("../public/images/"));
     } else {
-      cb({ error: "仅支持 jpg/png/gif 格式的图片！" });
+      cb({ error: "仅支持 jpeg/jpg/png/gif 格式的图片！" });
     }
   },
   //  3.2 存储名称

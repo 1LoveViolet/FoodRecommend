@@ -9,7 +9,6 @@ Vue.use(VueRouter);
 const Login = () => import("views/login/index.vue");
 const Register = () => import("views/register/index.vue");
 const Home = () => import("views/home/index.vue");
-
 const router = new VueRouter({
   // mode: "history", // history 模式去除地址栏 # 号
   routes: [
@@ -32,7 +31,6 @@ const router = new VueRouter({
       path: "/register",
       component: Register,
     },
-
     {
       path: "/home",
       component: Home,

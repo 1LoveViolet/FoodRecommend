@@ -29,10 +29,27 @@ router.get("/searchAllRestaurants", (req, res) => {
 });
 //首页展示商家信息 搜索框或主分类
 router.post("/searchRestaurants", (req, res) => {
-  const category = req.body.category;
-  const dishName = req.body.name;
+  // const category = req.body.category;
+  // const dishName = req.body.name;
+  const input = req.body.input;
   // 使用占位符防止 SQL 注入
-  const sql = `SELECT DISTINCT r.* FROM restaurants r INNER JOIN dishes d ON r.restaurant_id = d.restaurant_id WHERE ("${category}" IS NULL OR d.category LIKE "%${category}%") OR ("${dishName}" IS NULL OR d.name LIKE "%${dishName}%")`;
+  // const sql = `SELECT DISTINCT r.* FROM restaurants r INNER JOIN dishes d ON r.restaurant_id = d.restaurant_id WHERE ("${category}" IS NULL OR d.category LIKE "%${category}%") OR ("${dishName}" IS NULL OR d.name LIKE "%${dishName}%")`;
+  const sql = `SELECT DISTINCT *
+  FROM (
+      SELECT r.*
+      FROM restaurants r
+      WHERE r.name LIKE "%${input}%"
+         OR r.cuisine LIKE "%${input}%"
+         OR r.category LIKE "%${input}%"
+      UNION
+      SELECT r.*
+      FROM restaurants r
+      INNER JOIN dishes d ON r.restaurant_id = d.restaurant_id
+      WHERE d.name LIKE "%${input}%"
+         OR d.category LIKE "%${input}%"
+  ) AS combined_results;
+  
+  `;
   let where_value = [req.body.category, req.body.name];
   connection.query(sql, where_value, (err, results) => {
     if (err) {

@@ -1,6 +1,6 @@
 <template>
   <!-- <div class="goods" @click="itemClick"> -->
-  <div class="goodItem">
+  <div class="goodItem" @click="goodItemClick">
     <!-- <img :src="goodsItem.image_url" alt="" @load="imageLoad" /> -->
     <img class="logoimg" :src="goodsItem.image_url" alt="" />
     <div class="goods-info">
@@ -33,7 +33,9 @@ export default {
     goodsItem: {
       type: Object,
       default() {
-        return {};
+        return {
+          goodsItem: this.goodsItem,
+        };
       },
     },
   },
@@ -41,6 +43,10 @@ export default {
     return {};
   },
   methods: {
+    goodItemClick() {
+      console.log("点击了goodItem");
+      console.log("this.goodsItem: ", this.goodsItem);
+    },
     // imageLoad() {
     //   this.$bus.$emit("itemimageLoad");
     // },

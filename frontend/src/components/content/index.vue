@@ -11,24 +11,34 @@
           v-model="input"
           class="input-with-select"
         >
-          <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="inputClick"
+          ></el-button>
         </el-input>
       </div>
     </div>
     <TabControl
       ref="tabControl2"
-      class=""
+      v-if="!isShowDetail"
       :categorys="this.categoryList"
       @tabClick="tabClick(arguments)"
     ></TabControl>
     <Cuisine
       v-show="this.currentType !== '不限'"
       ref="tabControl3"
-      class=""
+      v-if="!isShowDetail"
       :cuisines="this.cuisineList"
       @cuisineClick="cuisineClick(arguments)"
     ></Cuisine>
-    <GoodsList :goods="this.showGoods"></GoodsList>
+    <GoodsList
+      ref="goodList"
+      :goods="this.showGoods"
+      :pagegoodList="this.pagegoodList"
+      @getPageInfoClick="getPageInfoClick(arguments)"
+    ></GoodsList>
+    <Detail v-if="isShowDetail"></Detail>
   </div>
 </template>
 
@@ -39,7 +49,10 @@ const GoodsList = () =>
   import("components/content/components/goodList/index.vue");
 const Cuisine = () =>
   import("components/content/components/cuisineList/index.vue");
+const Detail = () =>
+  import("components/content/components/goodDetail/index.vue");
 import {
+  searchRestaurants,
   searchRestaurantCuisine,
   searchRestaurantCategory,
   searchRestaurantsByCategory,
@@ -51,6 +64,7 @@ export default {
     TabControl,
     GoodsList,
     Cuisine,
+    Detail,
   },
   data() {
     return {
@@ -59,6 +73,8 @@ export default {
       cuisineList: [],
       showGoods: [],
       currentType: null,
+      pagegoodList: [],
+      isShowDetail: false,
       // goods: {
       //   pop: { page: 0, list: [] },
       //   new: { page: 0, list: [] },
@@ -77,12 +93,29 @@ export default {
       this.getCuisine(this.categoryList[0]);
       this.currentType = "不限";
     });
-  },
-  computed: {},
-  mounted() {
+
     this.getAllRestaurantInfo();
   },
+  computed: {},
+  mounted() {},
   methods: {
+    getPageInfoClick(argus) {
+      const { pagesize, currentPage } = argus[0];
+      console.log("调用了getPageInfo()");
+      //清空pagegoodList中的数据
+      this.pagegoodList = [];
+      // 获取当前页的数据
+      for (
+        let i = (currentPage - 1) * pagesize;
+        i < this.showGoods.length;
+        i++
+      ) {
+        //把遍历的数据添加到pagegoodList里面
+        this.pagegoodList.push(this.showGoods[i]);
+        //判断是否达到一页的要求
+        if (this.pagegoodList.length === pagesize) break;
+      }
+    },
     //对象数组去重
     uniqueFunc(arr, uniId) {
       const res = new Map();
@@ -92,23 +125,29 @@ export default {
     },
     getRestaurantInfoByCategory() {
       searchRestaurantsByCategory(this.currentType).then((res) => {
-        console.log(res);
         this.showGoods = res.data;
         console.log(this.showGoods);
+        if (this.$refs.goodList) {
+          this.$refs.goodList.getPageInfoClick();
+        }
       });
     },
     getRestaurantInfoByCuisine() {
       searchRestaurantsByCuisine(this.currentType).then((res) => {
-        console.log(res);
         this.showGoods = res.data;
         console.log(this.showGoods);
+        if (this.$refs.goodList) {
+          this.$refs.goodList.getPageInfoClick();
+        }
       });
     },
     getAllRestaurantInfo() {
       searchAllRestaurants().then((res) => {
-        console.log(res);
         this.showGoods = res.data;
         console.log(this.showGoods);
+        if (this.$refs.goodList) {
+          this.$refs.goodList.getPageInfoClick();
+        }
       });
     },
     //获取副种类
@@ -135,15 +174,25 @@ export default {
       } else {
         this.getRestaurantInfoByCategory();
       }
+
       // this.$refs.tabControl1.currentIndex = index;
     },
     cuisineClick(argus) {
       const { item, index } = argus[0];
-      console.log(item);
       this.currentType = item;
       console.log("this.currentType:  ", this.currentType);
       this.$refs.tabControl3.currentIndex = index;
       this.getRestaurantInfoByCuisine();
+    },
+
+    inputClick() {
+      console.log("input:  ", this.input);
+      let data = { input: this.input };
+      searchRestaurants(data).then((res) => {
+        console.log("输入框提交后结果:", res);
+        this.showGoods = res.data;
+        this.$refs.goodList.getPageInfoClick();
+      });
     },
   },
 };
@@ -152,10 +201,12 @@ export default {
 <style>
 .content-head {
   width: 100%;
+  position: relative;
   display: flex;
   /* background-color: blueviolet; */
   justify-content: space-between;
   margin-top: 20px;
+  border-bottom: 2px #ff6b37 solid;
 }
 .allcate {
   width: 30%;
