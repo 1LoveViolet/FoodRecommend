@@ -219,4 +219,75 @@ router.get("/searchRestaurantCuisine/:category", (req, res) => {
   });
 });
 
+//根据商家Id查询  商家信息，用户评论  商家菜品SELECT
+
+router.get("/searchRestaurantInfoById/:id", (req, res) => {
+  // 使用商家ID查询对应的菜品
+  const id = req.params.id;
+  const sql = `
+  SELECT 
+      'dishes' AS table_type,
+      d.restaurant_id,
+      d.dish_id,
+      d.name,
+      d.category,
+      d.description,
+      NULL AS cuisine,
+      NULL AS address,
+      NULL AS rating,
+      d.price,
+      NULL AS price_range,
+      d.image_url,
+      NULL AS area,
+      NULL AS phone,
+      NULL AS bankhour,
+      NULL AS story
+  FROM 
+      dishes d
+  WHERE 
+      d.restaurant_id = "${id}"
+  
+  UNION
+  
+  SELECT 
+      'restaurants' AS table_type,
+      r.restaurant_id,
+      NULL AS dish_id,
+      r.name,
+      r.category,
+      r.description,
+      r.cuisine,
+      r.address,
+      r.rating,
+      NULL AS price,
+      r.price_range,
+      r.image_url,
+      r.area,
+      r.phone,
+      r.bankhour,
+      r.story
+  FROM 
+      restaurants r
+  WHERE 
+      r.restaurant_id = "${id}";
+  
+      `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
+
 module.exports = router;

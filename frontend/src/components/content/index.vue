@@ -24,6 +24,7 @@
       v-if="!isShowDetail"
       :categorys="this.categoryList"
       @tabClick="tabClick(arguments)"
+      @hook:mounted="tabControl2Mounted"
     ></TabControl>
     <Cuisine
       v-show="this.currentType !== '不限'"
@@ -34,6 +35,7 @@
     ></Cuisine>
     <GoodsList
       ref="goodList"
+      v-if="!isShowDetail"
       :goods="this.showGoods"
       :pagegoodList="this.pagegoodList"
       @getPageInfoClick="getPageInfoClick(arguments)"
@@ -75,11 +77,6 @@ export default {
       currentType: null,
       pagegoodList: [],
       isShowDetail: false,
-      // goods: {
-      //   pop: { page: 0, list: [] },
-      //   new: { page: 0, list: [] },
-      //   sell: { page: 0, list: [] },
-      // },
     };
   },
   created() {
@@ -97,11 +94,12 @@ export default {
     this.getAllRestaurantInfo();
   },
   computed: {},
-  mounted() {},
+  mounted() {
+    // this.getAllRestaurantInfo();
+  },
   methods: {
     getPageInfoClick(argus) {
       const { pagesize, currentPage } = argus[0];
-      console.log("调用了getPageInfo()");
       //清空pagegoodList中的数据
       this.pagegoodList = [];
       // 获取当前页的数据
@@ -115,6 +113,9 @@ export default {
         //判断是否达到一页的要求
         if (this.pagegoodList.length === pagesize) break;
       }
+      // console.log("showgood", this.showGoods);
+      // console.log("pagegoodList", this.pagegoodList);
+      // console.log("父组件执行了getPageInfoClick()");
     },
     //对象数组去重
     uniqueFunc(arr, uniId) {
@@ -144,7 +145,6 @@ export default {
     getAllRestaurantInfo() {
       searchAllRestaurants().then((res) => {
         this.showGoods = res.data;
-        console.log(this.showGoods);
         if (this.$refs.goodList) {
           this.$refs.goodList.getPageInfoClick();
         }
@@ -175,7 +175,7 @@ export default {
         this.getRestaurantInfoByCategory();
       }
 
-      // this.$refs.tabControl1.currentIndex = index;
+      this.input = "";
     },
     cuisineClick(argus) {
       const { item, index } = argus[0];
@@ -183,9 +183,12 @@ export default {
       console.log("this.currentType:  ", this.currentType);
       this.$refs.tabControl3.currentIndex = index;
       this.getRestaurantInfoByCuisine();
+      this.input = "";
     },
 
     inputClick() {
+      this.currentType = "不限";
+      this.$refs.tabControl2.currentIndex = 0;
       console.log("input:  ", this.input);
       let data = { input: this.input };
       searchRestaurants(data).then((res) => {
@@ -193,6 +196,17 @@ export default {
         this.showGoods = res.data;
         this.$refs.goodList.getPageInfoClick();
       });
+    },
+    tabControl2Mounted() {
+      if (
+        this.$refs.tabControl2 &&
+        this.$route.params !== {} &&
+        this.$route.params !== undefined &&
+        this.$route.params.input
+      ) {
+        this.input = this.$route.params.input;
+        this.inputClick();
+      }
     },
   },
 };

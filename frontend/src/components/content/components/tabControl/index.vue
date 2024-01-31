@@ -8,7 +8,7 @@
         class="nav-category-item"
         @click="itemclick(item, index)"
       >
-        <span :class="{ active: index === currentIndex }">{{ item }}</span>
+        <div :class="{ active: index === currentIndex }">{{ item }}</div>
       </div>
     </div>
   </div>
@@ -64,7 +64,7 @@ export default {
   width: 97px;
   margin-bottom: 5px;
 }
-.nav-category-item span {
+.nav-category-item div {
   display: inline-block;
   margin-left: -4px;
   padding: 0px 4px;

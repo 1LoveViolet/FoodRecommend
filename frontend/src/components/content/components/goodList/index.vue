@@ -62,29 +62,8 @@ export default {
     // this.getPageInfoClick();
   },
   methods: {
-    // getPropToData(){
-    //   this.goods.forEach((item) => {
-    //   this.goodList.push(item);
-    // });
-    // },
-    // 获取当前页的数据信息
-    // getPageInfo() {
-    //   console.log("调用了getPageInfo()");
-    //   //清空pagegoodList中的数据
-    //   this.pagegoodList = [];
-    //   // 获取当前页的数据
-    //   for (
-    //     let i = (this.currentPage - 1) * this.pagesize;
-    //     i < this.goods.length;
-    //     i++
-    //   ) {
-    //     //把遍历的数据添加到pagegoodList里面
-    //     this.pagegoodList.push(this.goods[i]);
-    //     //判断是否达到一页的要求
-    //     if (this.pagegoodList.length === this.pagesize) break;
-    //   }
-    // },
     getPageInfoClick() {
+      // console.log("子组件执行了getPageInfoClick()");
       let currentPage = this.currentPage;
       let pagesize = this.pagesize;
       this.$emit("getPageInfoClick", { pagesize, currentPage });
@@ -115,6 +94,7 @@ export default {
   justify-content: flex-start;
   align-content: center;
   background: #ffffff;
+  border: 1px solid #f0f0f0;
 }
 .fenye {
   margin: 20px 0px;

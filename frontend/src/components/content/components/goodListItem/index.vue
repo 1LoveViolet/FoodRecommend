@@ -46,6 +46,18 @@ export default {
     goodItemClick() {
       console.log("点击了goodItem");
       console.log("this.goodsItem: ", this.goodsItem);
+      const newhref = this.$router.resolve({
+        path: "/detail",
+        name: "detail",
+        query: { id: this.goodsItem.restaurant_id },
+        // params: this.goodsItem.restaurant_id,
+      });
+
+      window.open(newhref.href, "_blank");
+      // this.$router.push({
+      //   name: "detail",
+      //   params: { goodItem: this.goodsItem },
+      // });
     },
     // imageLoad() {
     //   this.$bus.$emit("itemimageLoad");
@@ -64,6 +76,7 @@ export default {
   justify-content: flex-start;
   align-content: center;
   border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
 }
 .logoimg {
   width: 20%;

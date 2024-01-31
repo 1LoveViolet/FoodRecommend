@@ -1,0 +1,165 @@
+.content {
+    width: 1000px;
+    height: 100%;
+    /* background-color: aqua; */
+    margin: auto;
+    background: #f6f6f6;
+}
+
+.content-head {
+    width: 100%;
+    position: relative;
+    display: flex;
+    /* background-color: blueviolet; */
+    justify-content: space-between;
+    margin-top: 20px;
+    border-bottom: 2px #ff6b37 solid;
+}
+
+.allcate {
+    width: 30%;
+    position: relative;
+    background-color: #ff6b37;
+    color: #fff;
+    font-size: 15px;
+    text-align: center;
+    line-height: 35px;
+    font-family: "Microsoft YaHei", "Hiragino Sans GB";
+}
+
+.input {
+    width: 60%;
+}
+
+.detail {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.detail-head {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 18px 20px 25px;
+    background-color: #ffffff;
+    border: 1px solid #f0f0f0;
+}
+
+.detail-title {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: #333;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 33px;
+    margin-top: -7.5px;
+}
+
+.detail-rating,
+.detail-address,
+.detail-cuisine,
+.detail-phone,
+.detail-bankhour,
+.detail-price {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: #666;
+    line-height: 28px;
+    font-size: 14px;
+    font-family: "PingFangSC-Regular-address";
+}
+
+.detail-price {
+    margin-left: 10px;
+}
+
+.detail-writeRV {
+    /* display: flex;
+    justify-content: flex-start;
+    align-items: center; */
+    width: 120px;
+    height: 34px;
+    line-height: 34px;
+    background: #ff794d;
+    border-radius: 1px;
+    margin-top: 5px;
+    padding: 0;
+    font-size: 16px;
+    text-align: center;
+    margin-right: 8px;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.detail-card {
+    margin-bottom: 20px;
+}
+
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active {
+    color: #000;
+}
+
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active:hover {
+    color: #f56c6c;
+}
+
+.detail-dish {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.detail-dish-box {
+    position: relative;
+    border: 1px solid #ebebeb;
+    margin: 0 43px 15px 0;
+    /* margin-right: 45px;
+    margin-bottom: 5px; */
+}
+
+.detail-dish-img {
+    width: 93px;
+    height: 69px;
+}
+
+.detail-dish-price {
+    position: absolute;
+    top: 1px;
+    color: #fff;
+    right: 0;
+    padding: 0 5px;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, .65);
+    font-size: 12px;
+}
+
+.detail-photo {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.detail-photo img {
+    width: 100px;
+    height: 100px;
+}
+
+.detail-story {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.detail-story img {
+    width: 210px;
+    height: 156px;
+}
+
+.detail-story-content {
+    margin-left: 15px;
+    font-size: 14px;
+    line-height: 21px;
+    text-align: left;
+}

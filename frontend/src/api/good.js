@@ -93,3 +93,15 @@ export function searchRestaurantCuisine(category) {
     },
   });
 }
+
+//根据商品Id查询  商品信息，用户评论  商家菜品
+export function searchRestaurantInfoById(id) {
+  return axios({
+    url: `/api/searchRestaurantInfoById/${id}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
