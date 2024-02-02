@@ -68,7 +68,7 @@
               </div>
             </div>
           </el-tab-pane>
-          <el-tab-pane label="官网相册">
+          <el-tab-pane label="商家相册">
             <div class="detail-photo">
               <img :src="restaurantInfo[0].image_url" alt="" />
             </div>
@@ -84,6 +84,12 @@
           </el-tab-pane>
         </el-tabs>
       </div>
+
+      <GoodReview
+        :Reviews="this.showReviews"
+        :pagereviewList="this.pagereviewList"
+        @getPageInfoClick="getPageInfoClick(arguments)"
+      ></GoodReview>
     </div>
 
     <myfooter></myfooter>
@@ -93,11 +99,13 @@
 <script>
 const myheader = () => import("components/header/index.vue");
 const myfooter = () => import("components/footer/index.vue");
+const GoodReview = () => import("../goodReview/index.vue");
 import { searchRestaurants, searchRestaurantInfoById } from "api/good";
 export default {
   components: {
     myheader,
     myfooter,
+    GoodReview,
     // goodsList,
   },
   data() {
@@ -105,6 +113,8 @@ export default {
       goodItem: null,
       dishList: [],
       restaurantInfo: [],
+      pagereviewList: [],
+      showReviews: [],
       input: null,
     };
   },
@@ -120,6 +130,9 @@ export default {
           case "restaurants":
             this.restaurantInfo.push(item);
             break;
+          case "reviews":
+            this.showReviews.push(item);
+            break;
           default:
             break;
         }
@@ -127,12 +140,33 @@ export default {
     });
     console.log("detail中的dishList: ", this.dishList);
     console.log("detail中的restaurantInfo: ", this.restaurantInfo);
+    console.log("detail中的reviewList: ", this.showReviews);
   },
   mounted() {
     // console.log("params: ", this.$route.params);
     console.log("query: ", this.$route.query);
   },
   methods: {
+    getPageInfoClick(argus) {
+      const { pagesize, currentPage } = argus[0];
+      //清空pagereviewList中的数据
+      this.pagereviewList = [];
+      // 获取当前页的数据
+      for (
+        let i = (currentPage - 1) * pagesize;
+        i < this.showReviews.length;
+        i++
+      ) {
+        //把遍历的数据添加到pagereviewList里面
+        this.pagereviewList.push(this.showReviews[i]);
+        //判断是否达到一页的要求
+        if (this.pagereviewList.length === pagesize) break;
+      }
+      console.log(
+        "detail中的getPageInfoClick的this.pagereviewList: ",
+        this.pagereviewList
+      );
+    },
     inputClick() {
       // this.currentType = "不限";
       // this.$refs.tabControl2.currentIndex = 0;
@@ -145,7 +179,7 @@ export default {
 
       searchRestaurants(data).then((res) => {
         console.log("输入框提交后结果:", res);
-        // this.showGoods = res.data;
+        // this.showReviews = res.data;
         // this.$refs.goodList.getPageInfoClick();
       });
     },

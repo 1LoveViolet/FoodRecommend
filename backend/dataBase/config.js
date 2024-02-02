@@ -6,5 +6,6 @@ module.exports = {
     user: "root",
     password: "ou1685299181",
     database: "foodrecommend",
+    charset: "utf8mb4", // 确保数据库连接的字符集正确
   },
 };

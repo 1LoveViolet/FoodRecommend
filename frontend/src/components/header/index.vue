@@ -11,14 +11,14 @@
     <div class="nav">
       <div class="nav-item-menu-user" v-show="this.$store.state.isLogin">
         <div class="nav-item">
-          <div>{{ user.username }}</div>
+          <div @click="userClick()">{{ user.username }}</div>
         </div>
         <div class="menu-item-user">
           <div class="avatar">
             <img :src="this.userImage" alt="" />
           </div>
           <div class="menu-item-user-content">
-            <div class="username">{{ user.username }}</div>
+            <div class="username" @click="userClick()">{{ user.username }}</div>
             <div class="fansandreview">
               <div class="fansnum">粉丝：6</div>
               <div class="reviewnum">评论：7</div>
@@ -116,6 +116,20 @@ export default {
       this.$store.dispatch("clearUser");
       this.$store.dispatch("clearToken");
       this.$store.dispatch("changeisLogin");
+    },
+    userClick() {
+      const newhref = this.$router.resolve({
+        path: "/user",
+        name: "user",
+        query: { id: this.user.user_id },
+        // params: this.goodsItem.restaurant_id,
+      });
+
+      window.open(newhref.href, "_blank");
+      // this.$router.push({
+      //   name: "detail",
+      //   params: { goodItem: this.goodsItem },
+      // });
     },
   },
 };

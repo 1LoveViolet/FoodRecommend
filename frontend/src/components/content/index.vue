@@ -113,9 +113,6 @@ export default {
         //判断是否达到一页的要求
         if (this.pagegoodList.length === pagesize) break;
       }
-      // console.log("showgood", this.showGoods);
-      // console.log("pagegoodList", this.pagegoodList);
-      // console.log("父组件执行了getPageInfoClick()");
     },
     //对象数组去重
     uniqueFunc(arr, uniId) {
@@ -129,7 +126,10 @@ export default {
         this.showGoods = res.data;
         console.log(this.showGoods);
         if (this.$refs.goodList) {
+          this.$refs.goodList.currentPage = 1;
           this.$refs.goodList.getPageInfoClick();
+          console.log("tabclick点击后，showgood: ", this.showGoods);
+          console.log("tabclick点击后，pagegoodList: ", this.pagegoodList);
         }
       });
     },
@@ -138,7 +138,10 @@ export default {
         this.showGoods = res.data;
         console.log(this.showGoods);
         if (this.$refs.goodList) {
+          this.$refs.goodList.currentPage = 1;
           this.$refs.goodList.getPageInfoClick();
+          console.log("cuisineClick点击后，showgood: ", this.showGoods);
+          console.log("cuisineClick点击后，pagegoodList: ", this.pagegoodList);
         }
       });
     },
@@ -146,7 +149,13 @@ export default {
       searchAllRestaurants().then((res) => {
         this.showGoods = res.data;
         if (this.$refs.goodList) {
+          this.$refs.goodList.currentPage = 1;
           this.$refs.goodList.getPageInfoClick();
+          console.log("当选择不限,tabClick点击后，showgood: ", this.showGoods);
+          console.log(
+            "当选择不限,tabClick点击后，pagegoodList: ",
+            this.pagegoodList
+          );
         }
       });
     },
@@ -164,7 +173,6 @@ export default {
     //事件监听相关的代码
     tabClick(argus) {
       const { item, index } = argus[0];
-      console.log(item);
       this.currentType = item;
       console.log("this.currentType:  ", this.currentType);
       this.$refs.tabControl2.currentIndex = index;
@@ -174,7 +182,10 @@ export default {
       } else {
         this.getRestaurantInfoByCategory();
       }
-
+      if (this.$refs.goodList) {
+        this.$refs.goodList.currentPage = 1;
+        this.$refs.goodList.getPageInfoClick();
+      }
       this.input = "";
     },
     cuisineClick(argus) {
@@ -183,6 +194,10 @@ export default {
       console.log("this.currentType:  ", this.currentType);
       this.$refs.tabControl3.currentIndex = index;
       this.getRestaurantInfoByCuisine();
+      if (this.$refs.goodList) {
+        this.$refs.goodList.currentPage = 1;
+        this.$refs.goodList.getPageInfoClick();
+      }
       this.input = "";
     },
 
@@ -194,6 +209,7 @@ export default {
       searchRestaurants(data).then((res) => {
         console.log("输入框提交后结果:", res);
         this.showGoods = res.data;
+        this.$refs.goodList.currentPage = 1;
         this.$refs.goodList.getPageInfoClick();
       });
     },

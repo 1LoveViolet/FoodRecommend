@@ -146,4 +146,58 @@ router.post("/uploadAvatar", async (req, res) => {
   }
 });
 
+//查询用户信息
+router.get("/searchUserById/:user_id", (req, res) => {
+  // 使用商家ID查询对应的菜品
+  const user_id = req.params.user_id;
+  const sql = `
+    SELECT 
+        'users' AS table_type,
+        NULL AS favorite_id,
+        u.user_id,
+        NULL AS restaurant_id,
+        u.username,
+        u.email,
+        u.avatar_url,
+        u.sex,
+        u.residence
+    FROM 
+        users u
+    where 
+        u.user_id="${user_id}"
+    UNION
+
+    SELECT
+        'favorites' AS table_type,
+        f.favorite_id,
+        f.user_id,
+        f.restaurant_id,
+        NULL AS username,
+        NULL AS email,
+        NULL AS avatar_url,
+        NULL AS sex,
+        NULL AS residence
+    FROM
+        favorites f
+    JOIN users u ON f.user_id = u.user_id
+    WHERE
+        f.user_id = "${user_id}";
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
 module.exports = router;

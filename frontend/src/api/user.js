@@ -47,3 +47,15 @@ export function getAvatar(user_id) {
     },
   });
 }
+
+//获取用户信息
+export function searchUserById(user_id) {
+  return axios({
+    url: `/api/searchUserById/${user_id}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}

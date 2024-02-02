@@ -224,54 +224,90 @@ router.get("/searchRestaurantCuisine/:category", (req, res) => {
 router.get("/searchRestaurantInfoById/:id", (req, res) => {
   // 使用商家ID查询对应的菜品
   const id = req.params.id;
+  const charset = "utf8mb4"; // 设置字符集为utf8mb4
   const sql = `
   SELECT 
-      'dishes' AS table_type,
-      d.restaurant_id,
-      d.dish_id,
-      d.name,
-      d.category,
-      d.description,
-      NULL AS cuisine,
-      NULL AS address,
-      NULL AS rating,
-      d.price,
-      NULL AS price_range,
-      d.image_url,
-      NULL AS area,
-      NULL AS phone,
-      NULL AS bankhour,
-      NULL AS story
-  FROM 
-      dishes d
-  WHERE 
-      d.restaurant_id = "${id}"
-  
-  UNION
-  
-  SELECT 
-      'restaurants' AS table_type,
-      r.restaurant_id,
-      NULL AS dish_id,
-      r.name,
-      r.category,
-      r.description,
-      r.cuisine,
-      r.address,
-      r.rating,
-      NULL AS price,
-      r.price_range,
-      r.image_url,
-      r.area,
-      r.phone,
-      r.bankhour,
-      r.story
-  FROM 
-      restaurants r
-  WHERE 
-      r.restaurant_id = "${id}";
-  
-      `;
+        'dishes' AS table_type,
+        d.restaurant_id,
+        d.dish_id,
+        NULL AS review_id,
+        d.name,
+        d.category,
+        d.description,
+        NULL AS cuisine,
+        NULL AS address,
+        NULL AS rating,
+        d.price,
+        NULL AS price_range,
+        d.image_url,
+        NULL AS area,
+        NULL AS phone,
+        NULL AS bankhour,
+        NULL AS story,
+        NULL AS date,
+        NULL AS user_name,
+        NULL AS user_avatar
+    FROM 
+        dishes d
+    WHERE 
+        d.restaurant_id = "${id}"
+    
+    UNION
+    
+    SELECT 
+        'restaurants' AS table_type,
+        r.restaurant_id,
+        NULL AS dish_id,
+        NULL AS review_id,
+        r.name,
+        r.category,
+        r.description,
+        r.cuisine,
+        r.address,
+        r.rating,
+        NULL AS price,
+        r.price_range,
+        r.image_url,
+        r.area,
+        r.phone,
+        r.bankhour,
+        r.story,
+        NULL AS date,
+        NULL AS user_name,
+        NULL AS user_avatar
+    FROM 
+        restaurants r
+    WHERE 
+        r.restaurant_id = "${id}"
+
+    UNION
+
+    SELECT
+        'reviews' AS table_type,
+        rv.restaurant_id,
+        NULL AS dish_id,
+        rv.review_id,
+        NULL AS name,
+        NULL AS category,
+        rv.comment AS description,
+        NULL AS cuisine,
+        NULL AS address,
+        rv.rating,
+        NULL AS price,
+        NULL AS price_range,
+        NULL AS image_url,
+        NULL AS area,
+        NULL AS phone,
+        NULL AS bankhour,
+        NULL AS story,
+        rv.date,
+        u.username AS user_name,
+        u.avatar_url AS user_avatar
+    FROM
+        reviews rv
+    JOIN users u ON rv.user_id = u.user_id
+    WHERE
+        rv.restaurant_id = "${id}"; `;
   connection.query(sql, (err, results) => {
     if (err) {
       res.status(500).json({
@@ -281,6 +317,7 @@ router.get("/searchRestaurantInfoById/:id", (req, res) => {
         err: err,
       });
     } else {
+      res.header("Content-Type", `application/json; charset=${charset}`); // 设置响应头中的字符集
       res.json({
         code: "200",
         msg: "查询成功",
