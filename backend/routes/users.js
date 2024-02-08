@@ -151,37 +151,95 @@ router.get("/searchUserById/:user_id", (req, res) => {
   // 使用商家ID查询对应的菜品
   const user_id = req.params.user_id;
   const sql = `
-    SELECT 
-        'users' AS table_type,
-        NULL AS favorite_id,
-        u.user_id,
-        NULL AS restaurant_id,
-        u.username,
-        u.email,
-        u.avatar_url,
-        u.sex,
-        u.residence
-    FROM 
-        users u
-    where 
-        u.user_id="${user_id}"
-    UNION
+  SELECT 
+  'users' AS table_type,
+  NULL AS favorite_id,
+  NULL AS review_id,
+  u.user_id,
+  NULL AS restaurant_id,
+  NULL AS fdate,
+  NULL AS price,
+  NULL AS RVrating,
+  NULL AS comment,
+  NULL AS date,
+  u.username,
+  u.email,
+  u.avatar_url,
+  u.sex,
+  u.residence,
+  u.signature,
+  u.create_time,
+  NULL AS name,
+  NULL AS address,
+  NULL AS Rrating,
+  NULL AS area,
+  NULL AS phone
+FROM 
+  users u
+WHERE 
+  u.user_id = "${user_id}"
+UNION
 
-    SELECT
-        'favorites' AS table_type,
-        f.favorite_id,
-        f.user_id,
-        f.restaurant_id,
-        NULL AS username,
-        NULL AS email,
-        NULL AS avatar_url,
-        NULL AS sex,
-        NULL AS residence
-    FROM
-        favorites f
-    JOIN users u ON f.user_id = u.user_id
-    WHERE
-        f.user_id = "${user_id}";
+SELECT
+  'favorites' AS table_type,
+  f.favorite_id,
+  NULL AS review_id,
+  f.user_id,
+  f.restaurant_id,
+  f.fdate,
+  NULL AS price,
+  NULL AS RVrating,
+  NULL AS comment,
+  NULL AS date,
+  NULL AS username,
+  NULL AS email,
+  NULL AS avatar_url,
+  NULL AS sex,
+  NULL AS residence,
+  NULL AS signature,
+  NULL AS create_time,
+  r.name,
+  r.address,
+  r.rating,
+  r.area,
+  r.phone
+FROM
+  favorites f
+JOIN users u ON f.user_id = u.user_id
+JOIN restaurants r ON r.restaurant_id=f.restaurant_id
+WHERE
+  f.user_id = "${user_id}"
+UNION
+
+SELECT
+  'reviews' AS table_type,
+  NULL AS favorite_id,
+  rv.review_id,
+  rv.user_id,
+  rv.restaurant_id,
+  NULL AS fdate,
+  rv.price,
+  rv.rating,
+  rv.comment,
+  rv.date,
+  NULL AS username,
+  NULL AS email,
+  NULL AS avatar_url,
+  NULL AS sex,
+  NULL AS residence,
+  NULL AS signature,
+  NULL AS create_time,
+  r.name,
+  r.address,
+  r.rating,
+  r.area,
+  r.phone
+FROM
+  reviews rv
+JOIN users u ON rv.user_id = u.user_id
+JOIN restaurants r ON r.restaurant_id=rv.restaurant_id
+WHERE
+  rv.user_id = "${user_id}";
   `;
   connection.query(sql, (err, results) => {
     if (err) {
@@ -195,6 +253,93 @@ router.get("/searchUserById/:user_id", (req, res) => {
       res.json({
         code: "200",
         msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
+
+//通过review_id，删除对应评论
+router.delete("/deleteReviewById/:review_id", (req, res) => {
+  // 使用商家ID查询对应的菜品
+  const review_id = req.params.review_id;
+  const sql = `
+  DELETE FROM reviews
+WHERE review_id = "${review_id}";
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
+
+//通过favorite_id，删除对应收藏
+router.delete("/deleteFavoriteById/:favorite_id", (req, res) => {
+  // 使用商家ID查询对应的菜品
+  const favorite_id = req.params.favorite_id;
+  const sql = `
+  DELETE FROM favorites
+WHERE favorite_id = "${favorite_id}";
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "查询失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "查询成功",
+        data: results,
+      });
+    }
+  });
+});
+
+//通过user_id，修改用户信息
+router.post("/updateUserInfo", (req, res) => {
+  // 使用商家ID查询对应的菜品
+  const user_id = req.body.user_id;
+  const data = req.body.data;
+  const sql = `
+  UPDATE users
+SET 
+    username = "${data.username}",
+    password = "${data.password}",
+    email = "${data.email}",
+    sex = "${data.sex}",
+    residence = "${data.residence}",
+    signature = "${data.signature}"
+WHERE 
+    user_id = "${user_id}";
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "添加失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "添加成功",
         data: results,
       });
     }

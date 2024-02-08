@@ -37,7 +37,7 @@
         <div class="menu-item">
           <div>个人信息</div>
           <div>我的收藏</div>
-          <div>我的账单</div>
+          <div>我的设置</div>
         </div>
       </div>
       <div class="nav-item">
@@ -116,6 +116,7 @@ export default {
       this.$store.dispatch("clearUser");
       this.$store.dispatch("clearToken");
       this.$store.dispatch("changeisLogin");
+      this.$router.push("/home");
     },
     userClick() {
       const newhref = this.$router.resolve({

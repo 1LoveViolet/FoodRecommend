@@ -5,7 +5,7 @@ import "element-ui/lib/theme-chalk/index.css";
 import VueRouter from "vue-router";
 import router from "./router";
 import axios from "axios";
-
+import dayjs from "dayjs";
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(VueRouter);
@@ -14,6 +14,7 @@ axios.defaults.baseURL = "http://loaclhost:3000"; //我电脑问题，你们使�
 
 import store from "./store";
 Vue.prototype.$store = store;
+Vue.prototype.dayjs = dayjs;
 Vue.config.productionTip = false;
 
 new Vue({

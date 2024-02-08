@@ -13,7 +13,9 @@
         score-template="{value}"
       >
       </el-rate>
-      <div>{{ ReviewsItem.date }}</div>
+      <div>
+        {{ this.dayjs(ReviewsItem.date).format("YYYY-MM-DD HH:mm:ss") }}
+      </div>
       <div v-html="ReviewsItem.description"></div>
     </div>
   </div>
