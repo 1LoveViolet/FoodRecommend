@@ -12,9 +12,10 @@
     border: 1px solid #ccc;
 }
 
+
 .head img {
     width: 100px;
-    height: 100px;
+    /* height: 100px; */
     margin: 10px;
 }
 
@@ -67,6 +68,12 @@
     justify-content: flex-start;
 }
 
+.tabActive {
+    background-color: #ff8400;
+    border-color: #ff8400;
+    color: #fff;
+}
+
 .tabbox div {
     width: 12%;
     height: 21px;
@@ -77,8 +84,8 @@
     font-size: 14px;
     vertical-align: middle;
     border-color: #ffddb0;
-    background-color: #fdfbef;
-    color: #ff8400;
+    /* background-color: #fdfbef;
+    color: #ff8400; */
     cursor: pointer;
 }
 

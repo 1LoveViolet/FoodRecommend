@@ -73,6 +73,7 @@ export default {
     };
   },
   created() {
+    console.log("this.$store.state.user: ", this.$store.state.user);
     if (this.$store.state.user) {
       this.user = this.$store.state.user[0];
     } else {

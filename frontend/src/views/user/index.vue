@@ -15,6 +15,7 @@
               v-for="(item, index) in tabbox"
               :key="index"
               @click="tabItenClick(index)"
+              :class="{ tabActive: index === currentindex }"
             >
               {{ item }}
             </div>
@@ -28,7 +29,7 @@
         </div>
       </div>
       <div class="content">
-        <div class="content-1" v-if="currenttype == '首页'">
+        <div class="content-1" v-if="currentindex == 0">
           <div class="lside">
             <div class="lside-tabbox">
               <div class="lside-tabbox-item">
@@ -76,7 +77,7 @@
             </div>
           </div>
         </div>
-        <div class="content-2" v-if="currenttype == '评价'">
+        <div class="content-2" v-if="currentindex == 1">
           <div class="content-2-tabTitle">
             <div class="cur">商家评论</div>
           </div>
@@ -113,7 +114,7 @@
             </div>
           </div>
         </div>
-        <div class="content-3" v-if="currenttype == '收藏'">
+        <div class="content-3" v-if="currentindex == 2">
           <div class="content-3-left">
             <div class="content-3-tabTitle">
               <div class="cur">收藏商户</div>
@@ -172,7 +173,7 @@
             </div>
           </div>
         </div>
-        <div class="content-4" v-if="currenttype == '设置'">
+        <div class="content-4" v-if="currentindex == 3">
           <el-form ref="form" v-model="editform" label-width="200px">
             <el-form-item label="用户名称">
               <el-input v-model="editform.username"></el-input>
@@ -256,7 +257,7 @@ export default {
       favorites: [],
       reviews: [],
       tabbox: ["首页", "评价", "收藏", "设置"],
-      currenttype: "首页",
+      currentindex: 0,
       userRV: [],
       editform: {
         username: null,
@@ -274,22 +275,23 @@ export default {
   },
   methods: {
     tabItenClick(index) {
-      switch (index) {
-        case 0:
-          this.currenttype = "首页";
-          break;
-        case 1:
-          this.currenttype = "评价";
-          break;
-        case 2:
-          this.currenttype = "收藏";
-          break;
-        case 3:
-          this.currenttype = "设置";
-          break;
-        default:
-          break;
-      }
+      this.currentindex = index;
+      // switch (index) {
+      //   case 0:
+      //     this.currentindex = "首页";
+      //     break;
+      //   case 1:
+      //     this.currentindex = "评价";
+      //     break;
+      //   case 2:
+      //     this.currentindex = "收藏";
+      //     break;
+      //   case 3:
+      //     this.currentindex = "设置";
+      //     break;
+      //   default:
+      //     break;
+      // }
     },
     searchUserByIdmethod() {
       searchUserById(this.$route.query.id).then((res) => {
