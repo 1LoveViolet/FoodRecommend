@@ -105,3 +105,16 @@ export function searchRestaurantInfoById(id) {
     },
   });
 }
+
+//添加评论
+export function addReview(data) {
+  return axios({
+    url: `/api/addReview`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+    data: data,
+  });
+}

@@ -7,7 +7,7 @@
         <div class="head-content">
           <div class="head-content-namebox">
             <div class="head-content-name">{{ user.username }}</div>
-            <div class="head-content-edit">编辑资料</div>
+            <div class="head-content-edit" @click="edit">编辑资料</div>
           </div>
           <div class="head-content-residence">{{ user.residence }}</div>
           <div class="tabbox">
@@ -274,6 +274,9 @@ export default {
     console.log(this.$route.query);
   },
   methods: {
+    edit() {
+      this.currentindex = 3;
+    },
     tabItenClick(index) {
       this.currentindex = index;
       // switch (index) {
@@ -387,9 +390,17 @@ export default {
         user_id: this.user.user_id,
         data: this.editform,
       };
-      updateUserInfo(data);
-      console.log(data);
-      this.$router.go(0);
+      updateUserInfo(data).then((res) => {
+        this.$confirm("修改成功，请重新登录", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+        }).then(() => {
+          this.$store.dispatch("clearUser");
+          this.$store.dispatch("clearToken");
+          this.$store.dispatch("changeisLogin");
+          this.$router.push("/home");
+        });
+      });
     },
   },
 };

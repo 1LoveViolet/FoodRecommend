@@ -138,7 +138,6 @@ router.post("/searchRestaurantDishes", (req, res) => {
     }
   });
 });
-
 //查询商家评论
 router.post("/searchRestaurantReviews", (req, res) => {
   const restaurantId = req.body.restaurantId;
@@ -167,7 +166,6 @@ router.post("/searchRestaurantReviews", (req, res) => {
     }
   });
 });
-
 //查询商家表的菜品种
 router.get("/searchRestaurantCategory", (req, res) => {
   // 使用商家ID查询对应的菜品
@@ -192,7 +190,6 @@ router.get("/searchRestaurantCategory", (req, res) => {
     }
   });
 });
-
 //查询商家表的菜品种的副种类
 router.get("/searchRestaurantCuisine/:category", (req, res) => {
   // 使用商家ID查询对应的菜品
@@ -218,9 +215,7 @@ router.get("/searchRestaurantCuisine/:category", (req, res) => {
     }
   });
 });
-
 //根据商家Id查询  商家信息，用户评论  商家菜品SELECT
-
 router.get("/searchRestaurantInfoById/:id", (req, res) => {
   // 使用商家ID查询对应的菜品
   const id = req.params.id;
@@ -326,5 +321,32 @@ router.get("/searchRestaurantInfoById/:id", (req, res) => {
     }
   });
 });
-
+//添加评论
+router.post("/addReview", (req, res) => {
+  const restaurant_id = req.body.restaurant_id;
+  const user_id = req.body.user_id;
+  const rating = req.body.rating;
+  const comment = req.body.comment;
+  const date = req.body.date;
+  // 使用商家ID查询对应的菜品
+  const sql = `
+  insert into reviews set user_id="${user_id}" , restaurant_id="${restaurant_id}", rating="${rating}", comment="${comment}", date="${date}"
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).json({
+        code: "500",
+        msg: "添加评论失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "添加评论成功",
+        data: results,
+      });
+    }
+  });
+});
 module.exports = router;

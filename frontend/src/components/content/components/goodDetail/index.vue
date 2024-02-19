@@ -49,11 +49,13 @@
           <div class="detail-bankhour">
             营业时间：{{ restaurantInfo[0].bankhour }}
           </div>
-          <div class="detail-writeRV"><i class="el-icon-edit"></i>写评价</div>
+          <div class="detail-writeRV" @click="addReviewbtn">
+            <i class="el-icon-edit"></i>写评价
+          </div>
         </div>
       </div>
 
-      <div class="detail-card">
+      <div class="detail-card" v-show="!isAddReview">
         <el-tabs type="border-card">
           <el-tab-pane label="推荐菜">
             <div class="detail-dish">
@@ -86,10 +88,66 @@
       </div>
 
       <GoodReview
+        v-show="!isAddReview"
         :Reviews="this.showReviews"
         :pagereviewList="this.pagereviewList"
         @getPageInfoClick="getPageInfoClick(arguments)"
       ></GoodReview>
+
+      <el-form
+        ref="review"
+        :model="review"
+        label-width="80px"
+        v-show="isAddReview"
+      >
+        <el-form-item label="总体评价:">
+          <div class="form-rate">
+            <el-rate
+              v-model="review.rate"
+              :colors="colors"
+              show-text
+              allow-half
+            >
+            </el-rate>
+            <div>{{ review.rate }}</div>
+          </div>
+        </el-form-item>
+        <el-form-item label="评价:">
+          <el-popover
+            placement="left"
+            title="标题"
+            width="500"
+            height="700"
+            trigger="click"
+            v-model="emojiShow"
+          >
+            <div slot="reference" class="emojiBtn">😀</div>
+            <div class="browBox">
+              <ul>
+                <li
+                  v-for="(item, index) in faceList"
+                  :key="index"
+                  @click="getBrow(index)"
+                >
+                  {{ item }}
+                </li>
+              </ul>
+            </div>
+          </el-popover>
+          <el-input
+            type="textarea"
+            placeholder="请输入内容"
+            v-model="review.content"
+            maxlength="2000"
+            show-word-limit
+          >
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">发表评价</el-button>
+          <el-button>取消发表</el-button>
+        </el-form-item>
+      </el-form>
     </div>
 
     <myfooter></myfooter>
@@ -100,7 +158,12 @@
 const myheader = () => import("components/header/index.vue");
 const myfooter = () => import("components/footer/index.vue");
 const GoodReview = () => import("../goodReview/index.vue");
-import { searchRestaurants, searchRestaurantInfoById } from "api/good";
+const appData = require("@/assets/images/emojis.json");
+import {
+  searchRestaurants,
+  searchRestaurantInfoById,
+  addReview,
+} from "api/good";
 export default {
   components: {
     myheader,
@@ -116,6 +179,19 @@ export default {
       pagereviewList: [],
       showReviews: [],
       input: null,
+      isAddReview: false,
+      review: {
+        rate: null,
+        content: "",
+      },
+      colors: ["#99A9BF", "#F7BA2A", "#FF9900"], // 等同于 { 2: '#99A9BF', 4: { value: '#F7BA2A', excluded: true }, 5: '#FF9900' }
+      content: "",
+      //表情框是否展示
+      emojiShow: false,
+      //表情列表
+      faceList: [],
+      //表情文本
+      getBrowString: "",
     };
   },
   created() {
@@ -141,6 +217,7 @@ export default {
     console.log("detail中的dishList: ", this.dishList);
     console.log("detail中的restaurantInfo: ", this.restaurantInfo);
     console.log("detail中的reviewList: ", this.showReviews);
+    this.loadEmojis();
   },
   mounted() {
     // console.log("params: ", this.$route.params);
@@ -182,6 +259,52 @@ export default {
         // this.showReviews = res.data;
         // this.$refs.goodList.getPageInfoClick();
       });
+    },
+    addReviewbtn() {
+      this.isAddReview = !this.isAddReview;
+      console.log("addReviewbtn函数执行");
+    },
+    getNowTime() {
+      var now = new Date();
+      var year = now.getFullYear(); //获取年
+      var month = now.getMonth(); //获取月
+      var date = now.getDate(); //获取日
+      var hours = now.getHours(); //获取小时
+      var minutes = now.getMinutes(); //获取分钟
+      var seconds = now.getSeconds(); //获取秒
+      month = month + 1;
+      month = month.toString().padStart(2, "0");
+      date = date.toString().padStart(2, "0");
+      var defaultDate = `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
+      return defaultDate;
+    },
+    onSubmit() {
+      let data = {
+        restaurant_id: this.restaurantInfo[0].restaurant_id,
+        user_id: this.$store.state.user[0].user_id,
+        rating: this.review.rate,
+        comment: this.review.content,
+        date: this.getNowTime(),
+      };
+      addReview(data).then((res) => {
+        this.$router.go(0);
+        console.log(res);
+      });
+    },
+    loadEmojis() {
+      for (let i in appData) {
+        this.faceList.push(appData[i].char);
+      }
+    },
+    // 获取用户点击之后的标签 ，存放到输入框内
+    getBrow(index) {
+      for (let i in this.faceList) {
+        if (index == i) {
+          this.getBrowString = this.faceList[index];
+          this.review.content += this.getBrowString;
+        }
+      }
+      this.emojiShow = false;
     },
   },
 };

@@ -36,6 +36,7 @@
         </div>
         <div class="menu-item">
           <div>个人信息</div>
+          <div>我的评价</div>
           <div>我的收藏</div>
           <div>我的设置</div>
         </div>

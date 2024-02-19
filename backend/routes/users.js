@@ -29,17 +29,6 @@ router.post("/reg", (req, res) => {
   });
 });
 
-// router.get("/alluser", function (req, res, next) {
-//   connection.query("select * from users", (err, users) => {
-//     if (err) {
-//       res.send("query error");
-//     } else {
-//       // 将 MySQL 查询结果作为路由返回值
-//       res.send(users);
-//     }
-//   });
-// });
-
 //登录页面
 router.get("/login", (req, res) => {
   res.render("login");
@@ -320,7 +309,7 @@ router.post("/updateUserInfo", (req, res) => {
   UPDATE users
 SET 
     username = "${data.username}",
-    password = "${data.password}",
+    password = "${md5(data.password)}",
     email = "${data.email}",
     sex = "${data.sex}",
     residence = "${data.residence}",
