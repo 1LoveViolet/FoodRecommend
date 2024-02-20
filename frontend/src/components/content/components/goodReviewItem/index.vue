@@ -35,12 +35,25 @@ export default {
     return {};
   },
   created() {
+    this.formattedBr();
     this.formattedLocalTime();
     console.log("ReviewsItem: ", this.ReviewsItem);
   },
   methods: {
     formattedLocalTime() {
       console.log(this.ReviewsItem.date);
+    },
+    formattedBr() {
+      // 换行转为换行符
+      this.ReviewsItem.description = this.ReviewsItem.description.replace(
+        /\n/g,
+        "<br/>"
+      );
+      // 空格转为 &nbsp
+      this.ReviewsItem.description = this.ReviewsItem.description.replace(
+        / /g,
+        " &nbsp"
+      );
     },
   },
 };

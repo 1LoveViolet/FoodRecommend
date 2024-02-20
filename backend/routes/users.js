@@ -260,14 +260,14 @@ WHERE review_id = "${review_id}";
     if (err) {
       res.status(500).json({
         code: "500",
-        msg: "查询失败",
+        msg: "删除对应评论失败",
         data: null,
         err: err,
       });
     } else {
       res.json({
         code: "200",
-        msg: "查询成功",
+        msg: "删除对应评论成功",
         data: results,
       });
     }
@@ -286,14 +286,14 @@ WHERE favorite_id = "${favorite_id}";
     if (err) {
       res.status(500).json({
         code: "500",
-        msg: "查询失败",
+        msg: "删除对应收藏失败",
         data: null,
         err: err,
       });
     } else {
       res.json({
         code: "200",
-        msg: "查询成功",
+        msg: "删除对应收藏成功",
         data: results,
       });
     }
@@ -329,6 +329,80 @@ WHERE
       res.json({
         code: "200",
         msg: "添加成功",
+        data: results,
+      });
+    }
+  });
+});
+
+//添加收藏
+router.post("/addFavorite", (req, res) => {
+  let user_id = req.body.user_id;
+  let restaurant_id = req.body.restaurant_id;
+  let fdate = req.body.fdate;
+  var sql = `insert into favorites set user_id="${user_id}" , restaurant_id="${restaurant_id}", fdate="${fdate}"`;
+  // var add_value = [req.body.username, md5(req.body.password), req.body.email];
+  connection.query(sql, function (err, result) {
+    if (err) {
+      res.send({
+        code: "412",
+        msg: "新增收藏失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "添加收藏成功",
+        data: result,
+      });
+      //   响应内容 增加数据成功
+    }
+  });
+});
+//查询是否收藏
+router.get("/isFavorite/:user_id-:restaurant_id", (req, res) => {
+  let user_id = req.params.user_id;
+  let restaurant_id = req.params.restaurant_id;
+
+  var sql = `select * from favorites  where user_id= "${user_id}" AND restaurant_id= "${restaurant_id}"`;
+  // var add_value = [req.body.username, md5(req.body.password), req.body.email];
+  connection.query(sql, function (err, result) {
+    if (err) {
+      res.send({
+        code: "412",
+        msg: "未收藏",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "已收藏",
+        data: result,
+      }); //   响应内容 增加数据成功
+    }
+  });
+});
+//删除收藏
+router.delete("/deleteFavorite/:user_id-:restaurant_id", (req, res) => {
+  console.log(req.params);
+  // 使用商家ID查询对应的菜品
+  let user_id = req.params.user_id;
+  let restaurant_id = req.params.restaurant_id;
+  const sql = `DELETE FROM favorites WHERE user_id="${user_id}" AND restaurant_id="${restaurant_id}"`;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      res.json({
+        code: "500",
+        msg: "删除收藏失败",
+        data: null,
+        err: err,
+      });
+    } else {
+      res.json({
+        code: "200",
+        msg: "删除收藏成功",
         data: results,
       });
     }

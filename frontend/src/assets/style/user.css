@@ -386,7 +386,7 @@
 .content-3-ratingAndaddressAndphone div {
     display: flex;
     justify-content: center;
-    align-items: centerloginOut;
+    align-items: center;
     margin-right: 15px;
 }
 

@@ -96,3 +96,38 @@ export function updateUserInfo(data) {
     data: data,
   });
 }
+
+//添加收藏
+export function addFavorite(data) {
+  return axios({
+    url: "/api/addFavorite",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+    data: data,
+  });
+}
+//查询是否收藏
+export function isFavorite(user_id, restaurant_id) {
+  return axios({
+    url: `/api/isFavorite/${user_id}-${restaurant_id}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+//删除收藏
+export function deleteFavorite(user_id, restaurant_id) {
+  return axios({
+    url: `/api/deleteFavorite/${user_id}-${restaurant_id}`,
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}

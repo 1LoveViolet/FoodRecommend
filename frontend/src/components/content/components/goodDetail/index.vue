@@ -49,8 +49,16 @@
           <div class="detail-bankhour">
             营业时间：{{ restaurantInfo[0].bankhour }}
           </div>
-          <div class="detail-writeRV" @click="addReviewbtn">
-            <i class="el-icon-edit"></i>写评价
+          <div class="detail-writeRVBox">
+            <div class="detail-writeRV" @click="addReviewbtn">
+              <i class="el-icon-edit"></i>写评价
+            </div>
+            <div>
+              <i
+                :class="isFavorite ? 'el-icon-star-on' : 'el-icon-star-off'"
+                @click="favoriteBtn"
+              ></i>
+            </div>
           </div>
         </div>
       </div>
@@ -164,6 +172,7 @@ import {
   searchRestaurantInfoById,
   addReview,
 } from "api/good";
+import { addFavorite, deleteFavorite, isFavorite } from "api/user";
 export default {
   components: {
     myheader,
@@ -192,11 +201,11 @@ export default {
       faceList: [],
       //表情文本
       getBrowString: "",
+      isFavorite: false,
     };
   },
   created() {
     searchRestaurantInfoById(this.$route.query.id).then((res) => {
-      console.log("res: ", res);
       let Arr = res.data;
       Arr.forEach((item) => {
         switch (item.table_type) {
@@ -213,16 +222,14 @@ export default {
             break;
         }
       });
+      this.initIsFavorite();
     });
     console.log("detail中的dishList: ", this.dishList);
     console.log("detail中的restaurantInfo: ", this.restaurantInfo);
     console.log("detail中的reviewList: ", this.showReviews);
     this.loadEmojis();
   },
-  mounted() {
-    // console.log("params: ", this.$route.params);
-    console.log("query: ", this.$route.query);
-  },
+  mounted() {},
   methods: {
     getPageInfoClick(argus) {
       const { pagesize, currentPage } = argus[0];
@@ -305,6 +312,48 @@ export default {
         }
       }
       this.emojiShow = false;
+    },
+    favoriteBtn() {
+      this.isFavorite = !this.isFavorite;
+      if (this.isFavorite) {
+        let data = {
+          user_id: this.$store.state.user[0].user_id,
+          restaurant_id: this.restaurantInfo[0].restaurant_id,
+          fdate: this.getNowTime(),
+        };
+        addFavorite(data).then((res) => {
+          this.$notify({
+            title: "成功",
+            message: "收藏成功",
+            type: "success",
+            offset: 100,
+          });
+          console.log("收藏");
+        });
+      } else {
+        let user_id = this.$store.state.user[0].user_id;
+        let restaurant_id = this.restaurantInfo[0].restaurant_id;
+        deleteFavorite(user_id, restaurant_id).then((res) => {
+          this.$notify({
+            title: "取消",
+            message: "取消收藏",
+            type: "warning",
+            offset: 100,
+          });
+          console.log("取消收藏");
+        });
+      }
+    },
+    initIsFavorite() {
+      let user_id = this.$store.state.user[0].user_id;
+      let restaurant_id = this.restaurantInfo[0].restaurant_id;
+      isFavorite(user_id, restaurant_id).then((res) => {
+        if (res.data.length == 0) {
+          this.isFavorite = false;
+        } else {
+          this.isFavorite = true;
+        }
+      });
     },
   },
 };

@@ -77,6 +77,19 @@
     margin-left: 10px;
 }
 
+.detail-writeRVBox {
+    width: 95%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detail-writeRVBox i {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
 .detail-writeRV {
     /* display: flex;
     justify-content: flex-start;
