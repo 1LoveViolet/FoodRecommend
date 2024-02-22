@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="content">
-        <div class="content-1" v-if="currentindex == 0">
+        <div class="content-1" ref="content1" v-if="currentindex == 0">
           <div class="lside">
             <div class="lside-tabbox">
               <div class="lside-tabbox-item">
@@ -77,7 +77,7 @@
             </div>
           </div>
         </div>
-        <div class="content-2" v-if="currentindex == 1">
+        <div class="content-2" ref="content2" v-if="currentindex == 1">
           <div class="content-2-tabTitle">
             <div class="cur">商家评论</div>
           </div>
@@ -85,36 +85,55 @@
             v-if="!reviews.length"
             description="暂无数据,快写一条评论吧"
           />
-          <div v-for="(item, index) in reviews" :key="index" class="cur-item">
-            <div class="cur-name" @click="toGoodDetail(item.restaurant_id)">
-              <div class="cur-name-box">{{ item.name }}</div>
-            </div>
-            <div class="cur-address">{{ item.address }}</div>
-            <div class="cur-ratingAndprice">
-              <el-rate
-                v-model="item.RVrating"
-                disabled
-                show-score
-                text-color="#ff9900"
-                score-template="{value}"
-              >
-              </el-rate>
-              <div class="cur-price">人均:￥{{ item.price }}</div>
-            </div>
-            <div v-html="item.comment" class="cur-comment"></div>
-            <!-- <div>{{ item.date }}</div> -->
+          <div :data="reviews" class="reviewBox">
+            <div
+              v-for="(item, index) in pageReviewList"
+              :key="index"
+              class="cur-item"
+            >
+              <div class="cur-name" @click="toGoodDetail(item.restaurant_id)">
+                <div class="cur-name-box">{{ item.name }}</div>
+              </div>
+              <div class="cur-address">{{ item.address }}</div>
+              <div class="cur-ratingAndprice">
+                <el-rate
+                  v-model="item.RVrating"
+                  disabled
+                  show-score
+                  text-color="#ff9900"
+                  score-template="{value}"
+                >
+                </el-rate>
+                <div class="cur-price">人均:￥{{ item.price }}</div>
+              </div>
+              <div v-html="item.comment" class="cur-comment"></div>
+              <!-- <div>{{ item.date }}</div> -->
 
-            <div class="cur-dateAnddelete">
-              <div class="cur-date">
-                发表于:{{ dayjs(item.date).format("YYYY-MM-DD") }}
+              <div class="cur-dateAnddelete">
+                <div class="cur-date">
+                  发表于:{{ dayjs(item.date).format("YYYY-MM-DD") }}
+                </div>
+                <div class="cur-delete" @click="deleteRV(item.review_id)">
+                  删除
+                </div>
               </div>
-              <div class="cur-delete" @click="deleteRV(item.review_id)">
-                删除
-              </div>
+            </div>
+            <div class="block fenye">
+              <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="currentPage"
+                :page-sizes="[5, 10, 15, 20]"
+                :page-size="pagesize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="reviews.length"
+                @click="this.getPageInfoClick"
+              >
+              </el-pagination>
             </div>
           </div>
         </div>
-        <div class="content-3" v-if="currentindex == 2">
+        <div class="content-3" ref="content3" v-if="currentindex == 2">
           <div class="content-3-left">
             <div class="content-3-tabTitle">
               <div class="cur">收藏商户</div>
@@ -124,41 +143,58 @@
               v-if="!favorites.length"
               description="暂无数据,收藏你喜欢的商家"
             />
-            <div
-              v-for="(item, index) in favorites"
-              :key="index"
-              class="favorite-item"
-            >
+            <div :data="favorites" class="favoriteBox">
               <div
-                class="favorite-name-box"
-                @click="toGoodDetail(item.restaurant_id)"
+                v-for="(item, index) in pageFavoriteList"
+                :key="index"
+                class="favorite-item"
               >
-                <div class="favorite-name">{{ item.name }}</div>
-              </div>
-              <div class="content-3-ratingAndaddressAndphone">
-                <el-rate
-                  v-model="item.Rrating"
-                  disabled
-                  show-score
-                  text-color="#ff9900"
-                  score-template="{value}"
-                >
-                </el-rate>
-                <div>{{ item.area }}</div>
-                <div>{{ item.address }}</div>
-                <div>{{ item.phone }}</div>
-              </div>
-              <div class="content-3-favoriteAnddelete">
-                <div class="favorite-fdate">{{ item.fdate }}收藏</div>
                 <div
-                  class="favorite-delete"
-                  @click="deleteFavorite(item.favorite_id)"
+                  class="favorite-name-box"
+                  @click="toGoodDetail(item.restaurant_id)"
                 >
-                  删除
+                  <div class="favorite-name">{{ item.name }}</div>
                 </div>
+                <div class="content-3-ratingAndaddressAndphone">
+                  <el-rate
+                    v-model="item.Rrating"
+                    disabled
+                    show-score
+                    text-color="#ff9900"
+                    score-template="{value}"
+                  >
+                  </el-rate>
+                  <div>{{ item.area }}</div>
+                  <div>{{ item.address }}</div>
+                  <div>{{ item.phone }}</div>
+                </div>
+                <div class="content-3-favoriteAnddelete">
+                  <div class="favorite-fdate">{{ item.fdate }}收藏</div>
+                  <div
+                    class="favorite-delete"
+                    @click="deleteFavorite(item.favorite_id)"
+                  >
+                    删除
+                  </div>
+                </div>
+              </div>
+
+              <div class="block fenye">
+                <el-pagination
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="currentPage"
+                  :page-sizes="[5, 10, 15, 20]"
+                  :page-size="pagesize"
+                  layout="total, sizes, prev, pager, next, jumper"
+                  :total="favorites.length"
+                  @click="this.getPageInfoClick"
+                >
+                </el-pagination>
               </div>
             </div>
           </div>
+
           <div class="content-3-right">
             <div class="hd">
               <h4>收藏一家商家</h4>
@@ -173,7 +209,7 @@
             </div>
           </div>
         </div>
-        <div class="content-4" v-if="currentindex == 3">
+        <div class="content-4" ref="content4" v-if="currentindex == 3">
           <el-form ref="form" v-model="editform" label-width="200px">
             <el-form-item label="用户名称">
               <el-input v-model="editform.username"></el-input>
@@ -267,13 +303,41 @@ export default {
         residence: null,
         signature: null,
       },
+      currentPage: 1, //初始页
+      pagesize: 5, //    每页的数据
+      pageReviewList: [],
+      pageFavoriteList: [],
     };
   },
   created() {
+    console.log(this.$store.state.token);
     this.searchUserByIdmethod();
-    console.log(this.$route.query);
+  },
+  mounted() {
+    this.$bus.$on("toContent1", this.toContent1);
+    this.$bus.$on("toContent2", this.toContent2);
+    this.$bus.$on("toContent3", this.toContent3);
+    this.$bus.$on("toContent4", this.toContent4);
   },
   methods: {
+    toContent1(index) {
+      this.currentindex = index;
+    },
+    toContent2(index) {
+      this.currentindex = index;
+    },
+    toContent3(index) {
+      this.currentindex = index;
+    },
+    toContent4(index) {
+      this.currentindex = index;
+    },
+    formattedBr() {
+      this.reviews.forEach((item) => {
+        item.comment = item.comment.replace(/\n/g, "<br/>");
+        item.comment = item.comment.replace(/ /g, " &nbsp");
+      });
+    },
     edit() {
       this.currentindex = 3;
     },
@@ -318,6 +382,9 @@ export default {
               break;
           }
         });
+        this.formattedBr();
+        this.getPageInfoClick();
+        console.log("this.pageReviewList:", this.pageReviewList);
         console.log("this.user: ", this.user);
         console.log("this.favorites: ", this.favorites);
         console.log("this.reviews: ", this.reviews);
@@ -401,6 +468,50 @@ export default {
           this.$router.push("/home");
         });
       });
+    },
+    getPageInfoClick() {
+      // console.log("子组件执行了getPageInfoClick()");
+      let currentPage = this.currentPage;
+      let pagesize = this.pagesize;
+      console.log("getPageInfoClick中的currentPage的值", currentPage);
+      console.log("getPageInfoClick中的pagesize的值", pagesize);
+      this.pageReviewList = [];
+      this.pageFavoriteList = [];
+      // 获取当前页的数据
+      for (let i = (currentPage - 1) * pagesize; i < this.reviews.length; i++) {
+        //把遍历的数据添加到pageReviewList里面
+        this.pageReviewList.push(this.reviews[i]);
+        //判断是否达到一页的要求
+        if (this.pageReviewList.length === pagesize) break;
+      }
+      for (
+        let i = (currentPage - 1) * pagesize;
+        i < this.favorites.length;
+        i++
+      ) {
+        //把遍历的数据添加到pageReviewList里面
+        this.pageFavoriteList.push(this.favorites[i]);
+        //判断是否达到一页的要求
+        if (this.pageFavoriteList.length === pagesize) break;
+      }
+      console.log(
+        "getPageInfoClick中的this.pageReviewList的值",
+        this.pageReviewList
+      );
+    },
+    //分页时修改每页的行数,这里会自动传入一个size
+    handleSizeChange(size) {
+      //修改当前每页的数据行数
+      this.pagesize = size;
+      //数据重新分页
+      this.getPageInfoClick();
+    },
+    //调整当前的页码
+    handleCurrentChange(pageNumber) {
+      //修改当前的页码
+      this.currentPage = pageNumber;
+      //数据重新分页
+      this.getPageInfoClick();
     },
   },
 };

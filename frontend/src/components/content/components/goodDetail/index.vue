@@ -268,8 +268,19 @@ export default {
       });
     },
     addReviewbtn() {
-      this.isAddReview = !this.isAddReview;
-      console.log("addReviewbtn函数执行");
+      if (this.$store.state.token) {
+        this.isAddReview = !this.isAddReview;
+        console.log("addReviewbtn函数执行");
+      } else {
+        // 用户未登录，重定向到登录页面或其他处理方式
+        this.$alert("请先登录", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+          callback: () => {
+            this.$router.push("/login");
+          },
+        });
+      }
     },
     getNowTime() {
       var now = new Date();
@@ -314,46 +325,59 @@ export default {
       this.emojiShow = false;
     },
     favoriteBtn() {
-      this.isFavorite = !this.isFavorite;
-      if (this.isFavorite) {
-        let data = {
-          user_id: this.$store.state.user[0].user_id,
-          restaurant_id: this.restaurantInfo[0].restaurant_id,
-          fdate: this.getNowTime(),
-        };
-        addFavorite(data).then((res) => {
-          this.$notify({
-            title: "成功",
-            message: "收藏成功",
-            type: "success",
-            offset: 100,
+      if (this.$store.state.token) {
+        this.isFavorite = !this.isFavorite;
+        if (this.isFavorite) {
+          let data = {
+            user_id: this.$store.state.user[0].user_id,
+            restaurant_id: this.restaurantInfo[0].restaurant_id,
+            fdate: this.getNowTime(),
+          };
+          addFavorite(data).then((res) => {
+            this.$notify({
+              title: "成功",
+              message: "收藏成功",
+              type: "success",
+              offset: 100,
+            });
+            console.log("收藏");
           });
-          console.log("收藏");
-        });
+        } else {
+          let user_id = this.$store.state.user[0].user_id;
+          let restaurant_id = this.restaurantInfo[0].restaurant_id;
+          deleteFavorite(user_id, restaurant_id).then((res) => {
+            this.$notify({
+              title: "取消",
+              message: "取消收藏",
+              type: "warning",
+              offset: 100,
+            });
+            console.log("取消收藏");
+          });
+        }
       } else {
-        let user_id = this.$store.state.user[0].user_id;
-        let restaurant_id = this.restaurantInfo[0].restaurant_id;
-        deleteFavorite(user_id, restaurant_id).then((res) => {
-          this.$notify({
-            title: "取消",
-            message: "取消收藏",
-            type: "warning",
-            offset: 100,
-          });
-          console.log("取消收藏");
+        // 用户未登录，重定向到登录页面或其他处理方式
+        this.$alert("请先登录", "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+          callback: () => {
+            this.$router.push("/login");
+          },
         });
       }
     },
     initIsFavorite() {
-      let user_id = this.$store.state.user[0].user_id;
-      let restaurant_id = this.restaurantInfo[0].restaurant_id;
-      isFavorite(user_id, restaurant_id).then((res) => {
-        if (res.data.length == 0) {
-          this.isFavorite = false;
-        } else {
-          this.isFavorite = true;
-        }
-      });
+      if (this.$store.state.token) {
+        let user_id = this.$store.state.user[0].user_id;
+        let restaurant_id = this.restaurantInfo[0].restaurant_id;
+        isFavorite(user_id, restaurant_id).then((res) => {
+          if (res.data.length == 0) {
+            this.isFavorite = false;
+          } else {
+            this.isFavorite = true;
+          }
+        });
+      }
     },
   },
 };

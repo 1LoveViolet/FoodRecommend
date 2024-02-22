@@ -32,17 +32,17 @@
       </div>
       <div class="nav-item-menu">
         <div class="nav-item">
-          <div>个人中心</div>
+          <div @click="toUser">个人中心</div>
         </div>
         <div class="menu-item">
-          <div>个人信息</div>
-          <div>我的评价</div>
-          <div>我的收藏</div>
-          <div>我的设置</div>
+          <div @click="toContent1">个人信息</div>
+          <div @click="toContent2">我的评价</div>
+          <div @click="toContent3">我的收藏</div>
+          <div @click="toContent4">我的设置</div>
         </div>
       </div>
       <div class="nav-item">
-        <div>入驻指引</div>
+        <div @click="toHome">美食首页</div>
       </div>
       <div class="nav-item">
         <div>商务服务</div>
@@ -71,6 +71,10 @@ export default {
     return {
       user: {},
       userImage: null,
+      index1: 0,
+      index2: 1,
+      index3: 2,
+      index4: 3,
     };
   },
   created() {
@@ -125,14 +129,91 @@ export default {
         path: "/user",
         name: "user",
         query: { id: this.user.user_id },
-        // params: this.goodsItem.restaurant_id,
       });
 
       window.open(newhref.href, "_blank");
-      // this.$router.push({
-      //   name: "detail",
-      //   params: { goodItem: this.goodsItem },
-      // });
+    },
+    toContent1() {
+      this.$router
+        .push({
+          path: "/user",
+          query: {
+            //query是个配置项
+            id: this.user.user_id,
+          },
+        })
+        .then((res) => {
+          this.$bus.$emit("toContent1", this.index1);
+        })
+        .catch(() => {
+          this.$bus.$emit("toContent2", this.index1);
+        });
+      // this.$bus.$emit("toContent1", this.index1);
+    },
+    toContent2() {
+      this.$router
+        .push({
+          path: "/user",
+          query: {
+            //query是个配置项
+            id: this.user.user_id,
+          },
+        })
+        .then((res) => {
+          this.$bus.$emit("toContent2", this.index2);
+        })
+        .catch(() => {
+          this.$bus.$emit("toContent2", this.index2);
+        });
+      // this.$bus.$emit("toContent2", this.index2);
+    },
+    toContent3() {
+      this.$router
+        .push({
+          path: "/user",
+          query: {
+            //query是个配置项
+            id: this.user.user_id,
+          },
+        })
+        .then((res) => {
+          this.$bus.$emit("toContent2", this.index3);
+        })
+        .catch(() => {
+          this.$bus.$emit("toContent2", this.index3);
+        });
+      // this.$bus.$emit("toContent3", this.index3);
+    },
+    toContent4() {
+      this.$router
+        .push({
+          path: "/user",
+          query: {
+            //query是个配置项
+            id: this.user.user_id,
+          },
+        })
+        .then((res) => {
+          this.$bus.$emit("toContent2", this.index4);
+        })
+        .catch(() => {
+          this.$bus.$emit("toContent2", this.index4);
+        });
+      // this.$bus.$emit("toContent4", this.index4);
+    },
+    toHome() {
+      this.$router.push({
+        path: "/home",
+      });
+    },
+    toUser() {
+      this.$router.push({
+        path: "/user",
+        query: {
+          //query是个配置项
+          id: this.user.user_id,
+        },
+      });
     },
   },
 };

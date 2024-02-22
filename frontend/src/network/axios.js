@@ -1,6 +1,6 @@
 import originAxios from "axios";
 import qs from "qs";
-
+import store from "../store/index";
 export default function axios(option) {
   return new Promise((resolve, reject) => {
     // 1.创建axios的实例
@@ -20,6 +20,10 @@ export default function axios(option) {
         // 3.对请求的参数进行序列化(看服务器是否需要序列化)
         // config.data = qs.stringify(config.data)
         // console.log(config);
+        config.headers = {
+          ...config.headers,
+          Authorization: store.state.token,
+        };
 
         // 4.等等
         return config;

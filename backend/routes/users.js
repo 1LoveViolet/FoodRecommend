@@ -46,7 +46,7 @@ router.post("/login", (req, res) => {
         err: err,
       });
     }
-    if (users != null) {
+    if (users != null && users != [] && users.length != 0) {
       let token = jwt.sign(
         {
           username: users.username,
@@ -63,6 +63,13 @@ router.post("/login", (req, res) => {
         msg: "登录成功",
         data: users,
         token: token,
+      });
+    } else {
+      res.send({
+        code: "404",
+        msg: "用户或密码错误",
+        data: null,
+        token: null,
       });
     }
   });

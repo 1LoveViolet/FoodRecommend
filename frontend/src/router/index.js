@@ -47,64 +47,6 @@ const router = new VueRouter({
       path: "/home",
       name: "Home",
       component: Home,
-      //   children: [
-      //     {
-      //       path: "/home/edit",
-      //       component: Edit,
-      //       // redirect: "/edit/basic",
-      //       children: [
-      //         {
-      //           path: "/edit/basic",
-      //           component: BasicInfo,
-      //           meta: { requireAuth: false },
-      //         },
-      //         {
-      //           path: "/edit/paper",
-      //           component: Paper,
-      //         },
-      //         {
-      //           path: "/edit/address",
-      //           component: Address,
-      //         },
-      //         {
-      //           path: "/edit/contact",
-      //           component: Contact,
-      //         },
-      //         {
-      //           path: "/edit/education",
-      //           component: Education,
-      //         },
-      //         {
-      //           path: "/edit/skill",
-      //           component: Skill,
-      //         },
-      //         {
-      //           path: "/edit/workExp",
-      //           component: WorkExp,
-      //         },
-      //         {
-      //           path: "/edit/projectExp",
-      //           component: ProjectExp,
-      //         },
-      //         {
-      //           path: "/edit/salary",
-      //           component: Salary,
-      //         },
-      //       ],
-      //     },
-      //     {
-      //       path: "/home/person",
-      //       component: Person,
-      //     },
-      //     {
-      //       path: "/home/salary",
-      //       component: Salary,
-      //     },
-      //     {
-      //       path: "/home/workpost",
-      //       component: WorkPost,
-      //     },
-      //   ],
     },
   ],
   mode: "history",
@@ -117,6 +59,7 @@ router.beforeEach((to, from, next) => {
     to.path === "/login" ||
     to.path === "/register" ||
     to.path === "/home" ||
+    to.path === "/detail" ||
     to.path === "/"
   ) {
     // 如果是登录或注册页面，直接允许访问

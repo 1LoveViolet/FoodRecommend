@@ -68,48 +68,21 @@ export default {
             this.$store.dispatch("changeisLogin");
             this.$router.push("/home");
           }
+          if (response.code == "404") {
+            this.$alert(response.msg, "提示", {
+              confirmButtonText: "确定",
+              type: "warning",
+              callback: () => {
+                this.$router.push("/login");
+              },
+            });
+          }
         })
         .catch(function (error) {
           console.log(error);
         });
-      // this.axios.get("api/alluser").then((response) => {
-      //   console.log(response);
-      // });
-      // axios({
-      //   url: "api/alluser",
-      //   method: "get",
-      // }).then((response) => {
-      //   console.log(response);
-      // });
     },
-    // login() {
-    //   // 用户登录逻辑
-    //   const username = this.username;
-    //   const password = this.password;
-    //   // 发送登录请求
-    //   this.axios.post('user/login', {
-    //     username: username,
-    //     password: password
-    //   })
-    //     .then((response) => {
-    //       // 登录成功的处理逻辑
-    //       // 例如，保存登录状态、跳转到其他页面等
-    //       // 成功登录后将用户ID存储到Vuex
-    //       const userId = response.data.data.id
-    //       const userName = response.data.data.username
-    //       // console.log(userId)
-    //       // console.log(userName)
-    //       this.$store.dispatch('setUserId', userId);
-    //       this.$store.dispatch('setUserName', userName);
-    //       // console.log('userId: ' + this.$store.state.user.userId)
-    //       // console.log('userId: ' + this.$store.state.user.userName)
-    //       this.$router.push('/home')
-    //     })
-    //     .catch((error) => {
-    //       // 登录失败的处理逻辑
-    //       // 例如，显示错误信息给用户
-    //     });
-    // },
+
     toSMSRegister() {
       this.$router.replace("/register");
     },
