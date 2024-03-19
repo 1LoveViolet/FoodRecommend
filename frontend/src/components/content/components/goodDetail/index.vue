@@ -39,8 +39,16 @@
               人均：{{ restaurantInfo[0].price_range }}
             </div>
           </div>
-          <div class="detail-address">
+          <div
+            class="detail-address"
+            @click="onSearchAddress(restaurantInfo[0].address)"
+          >
             地址：{{ restaurantInfo[0].address }}
+            <i
+              class="el-icon-location"
+              @click="onSearchAddress(scope.row.duAddress)"
+            >
+            </i>
           </div>
           <div class="detail-phone">电话：{{ restaurantInfo[0].phone }}</div>
           <div class="detail-cuisine">
@@ -74,7 +82,9 @@
               >
                 <img :src="item.image_url" alt="" class="detail-dish-img" />
                 <div>{{ item.name }}</div>
-                <div class="detail-dish-price">￥{{ item.price }}</div>
+                <div class="detail-dish-price" v-if="item.price">
+                  ￥{{ item.price }}
+                </div>
               </div>
             </div>
           </el-tab-pane>
@@ -158,6 +168,30 @@
       </el-form>
     </div>
 
+    <!-- 地图 -->
+    <el-dialog title="地理位置" :visible.sync="dialogVisible" width="50%">
+      <div class="map_address">
+        <div class="address-wrapper" :style="{ width: '100%', height: '100%' }">
+          <el-amap
+            vid="amap"
+            :key="amapKey"
+            class="amap-demo"
+            :amap-manager="amapManager"
+            :center="center"
+            :zoom="zoom"
+            style="height: 500px; width: 800px"
+          >
+            <el-amap-marker
+              v-for="(marker, index) in markers"
+              :key="'marker' + index"
+              :position="marker"
+            >
+            </el-amap-marker>
+          </el-amap>
+        </div>
+      </div>
+    </el-dialog>
+
     <myfooter></myfooter>
   </div>
 </template>
@@ -173,6 +207,10 @@ import {
   addReview,
 } from "api/good";
 import { addFavorite, deleteFavorite, isFavorite } from "api/user";
+
+//引入获取实例
+import { AMapManager } from "vue-amap";
+let amapManager = new AMapManager();
 export default {
   components: {
     myheader,
@@ -181,6 +219,7 @@ export default {
     // goodsList,
   },
   data() {
+    const self = this;
     return {
       goodItem: null,
       dishList: [],
@@ -202,6 +241,17 @@ export default {
       //表情文本
       getBrowString: "",
       isFavorite: false,
+      amapKey: "66be375bbee739346813eda698d5e2c8",
+      center: [0, 0],
+      loaded: false,
+      zoom: 17,
+      input: "",
+      lng: 0,
+      lat: 0,
+      amapManager,
+      searchOption: { city: "全国", citylimit: false },
+      markers: [], //标记
+      dialogVisible: false,
     };
   },
   created() {
@@ -378,6 +428,32 @@ export default {
           }
         });
       }
+    },
+    onSearchAddress(e) {
+      this.dialogVisible = true;
+      console.log(" onSearchAddress方法的e:", e);
+      AMap.plugin("AMap.Geocoder", () => {
+        var geocoder = new AMap.Geocoder({
+          // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+          city: "成都市",
+        });
+        geocoder.getLocation(e, (status, result) => {
+          console.log("getLocation的status:", status);
+          console.log("getLocation的result:", result);
+          if (status === "complete" && result.info === "OK") {
+            // result中对应详细地理坐标信息
+            this.center = [
+              result.geocodes[0].location.lng,
+              result.geocodes[0].location.lat,
+            ];
+            this.markers.push([
+              result.geocodes[0].location.lng,
+              result.geocodes[0].location.lat,
+            ]);
+            //把搜索的位置的第一个值
+          }
+        });
+      });
     },
   },
 };

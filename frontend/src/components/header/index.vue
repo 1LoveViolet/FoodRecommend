@@ -8,6 +8,9 @@
         @click="toHome"
       />
     </div>
+    <!-- <div class="positionCity">
+      <i class="el-icon-location"></i>{{ positionCity }}
+    </div> -->
     <div class="nav">
       <div class="nav-item-menu-user" v-show="this.$store.state.isLogin">
         <div class="nav-item">
@@ -65,6 +68,7 @@
 <script>
 import $ from "jquery";
 import { getAvatar } from "api/user";
+import MapLoader from "unti/unti";
 export default {
   components: {},
   data() {
@@ -75,6 +79,7 @@ export default {
       index2: 1,
       index3: 2,
       index4: 3,
+      positionCity: null,
     };
   },
   created() {
@@ -84,6 +89,17 @@ export default {
     } else {
       this.user.username = "登录/注册";
     }
+    // 调用 MapLoader 方法并传递回调函数
+    let positionInfo = {}; // 初始化positionInfo
+    MapLoader(positionInfo)
+      .then((positionInfo) => {
+        console.log("得到处理后的数据", positionInfo);
+        // 在这里处理positionInfo的数据
+        this.positionCity = positionInfo.addressComponent.city;
+      })
+      .catch((error) => {
+        console.error("发生错误", error);
+      });
   },
   mounted() {
     // $(".menu-item").css("display", "flex");
@@ -105,11 +121,13 @@ export default {
     $(".nav-item-menu-user").mouseout(function () {
       $(".menu-item-user").css("display", "none");
     });
-    getAvatar(this.$store.state.user[0].user_id).then((res) => {
-      // console.log(res);
-      const data = res.data;
-      this.userImage = data.avatar_url;
-    });
+    if (this.$store.state.user) {
+      getAvatar(this.$store.state.user[0].user_id).then((res) => {
+        // console.log(res);
+        const data = res.data;
+        this.userImage = data.avatar_url;
+      });
+    }
   },
   methods: {
     toHome() {
@@ -146,7 +164,7 @@ export default {
           this.$bus.$emit("toContent1", this.index1);
         })
         .catch(() => {
-          this.$bus.$emit("toContent2", this.index1);
+          this.$bus.$emit("toContent1", this.index1);
         });
       // this.$bus.$emit("toContent1", this.index1);
     },

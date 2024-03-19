@@ -12,6 +12,7 @@ module.exports = defineConfig({
         store: "@/store",
         router: "@/router",
         api: "@/api",
+        unti: "@/unti",
       },
     },
   },

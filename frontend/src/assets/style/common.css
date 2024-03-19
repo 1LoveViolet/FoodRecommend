@@ -10,7 +10,12 @@ header {
     width: 100%;
     height: 86px;
     background-color: #FFFFFF;
-    z-index: 999;
+    z-index: 9999;
+}
+
+.el-dialog__wrapper {
+    z-index: 9998;
+    /* 将 el-dialog 的 z-index 值设置为比 sticky 元素更低的值 */
 }
 
 body {
@@ -450,3 +455,8 @@ footer {
     overflow: hidden;
     height: 100%;
   } */
+/* .positionCity {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */

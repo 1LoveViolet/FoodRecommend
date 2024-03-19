@@ -12,7 +12,9 @@
     "core-js": "^3.8.3",
     "dayjs": "^1.11.10",
     "jquery": "^3.7.1",
-    "vue": "^2.6.14"
+    "swiper": "^11.0.7",
+    "vue": "^2.6.14",
+    "vue-amap": "^0.5.10"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

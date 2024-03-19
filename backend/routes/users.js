@@ -169,7 +169,9 @@ router.get("/searchUserById/:user_id", (req, res) => {
   NULL AS address,
   NULL AS Rrating,
   NULL AS area,
-  NULL AS phone
+  NULL AS phone,
+  NULL AS category,
+  NULL AS cuisine
 FROM 
   users u
 WHERE 
@@ -198,7 +200,7 @@ SELECT
   r.address,
   r.rating,
   r.area,
-  r.phone
+  r.phone,r.category,r.cuisine
 FROM
   favorites f
 JOIN users u ON f.user_id = u.user_id
@@ -229,7 +231,7 @@ SELECT
   r.address,
   r.rating,
   r.area,
-  r.phone
+  r.phone,r.category,r.cuisine
 FROM
   reviews rv
 JOIN users u ON rv.user_id = u.user_id
@@ -328,14 +330,14 @@ WHERE
     if (err) {
       res.status(500).json({
         code: "500",
-        msg: "添加失败",
+        msg: "修改失败",
         data: null,
         err: err,
       });
     } else {
       res.json({
         code: "200",
-        msg: "添加成功",
+        msg: "修改成功",
         data: results,
       });
     }

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <!-- Set render engine for 360 browser -->
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      rel="stylesheet"
+      href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cache.amap.com/lbs/static/addToolbar.js"
+    ></script>
+
+    <title>高德地图经纬度抓取</title>
+    <style>
+      .map {
+        margin: 50px;
+        height: 300px;
+        width: 30%;
+      }
+      .result {
+        margin: 0 50px;
+      }
+      .result div {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container" class="map"></div>
+    <div class="result">
+      <div>鼠标点击纬度：<span id="c-latitude"></span></div>
+      <div>鼠标点击经度：<span id="c-longitude"></span></div>
+    </div>
+    <script
+      type="text/javascript"
+      src="https://webapi.amap.com/maps?v=1.4.15&key=66be375bbee739346813eda698d5e2c8&plugin=AMap.Autocomplete"
+    ></script>
+    <script type="text/javascript">
+      var map = new AMap.Map("container", {
+        resizeEnable: true,
+      });
+      // 为地图注册 click 事件获取鼠标点击出的经纬度坐标
+      map.on("click", function (e) {
+        console.log(e);
+        document.getElementById("c-longitude").innerText = e.lnglat.getLng();
+        document.getElementById("c-latitude").innerText = e.lnglat.getLat();
+      });
+    </script>
+  </body>
+</html>

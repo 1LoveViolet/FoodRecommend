@@ -1,17 +1,36 @@
 <!DOCTYPE html>
 <html lang="">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong
+        >We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
+        properly without JavaScript enabled. Please enable it to
+        continue.</strong
+      >
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
+  <script type="text/javascript">
+    window._AMapSecurityConfig = {
+      securityJsCode: "afa9815bc334a1ee17e5990ee8c799d2",
+      // serviceHost:'您的代理服务器域名或地址/_AMapService',
+      // 例如 ：serviceHost:'http://1.1.1.1:80/_AMapService',
+    };
+  </script>
+  <script
+    type="text/javascript"
+    src="https://webapi.amap.com/maps?v=1.4.11&key=66be375bbee739346813eda698d5e2c8&
+  plugin=AMap.Geocoder,AMap.Geolocation,AMap.PolyEditor,AMap.
+  PlaceSearch,AMap.Autocomplete"
+  ></script>
+  <!-- <script src="https://webapi.amap.com/ui/1.1/main.js"></script>
+  <script src="//a.amap.com/jsapi_demos/static/resource/heatmapData.js"></script> -->
 </html>

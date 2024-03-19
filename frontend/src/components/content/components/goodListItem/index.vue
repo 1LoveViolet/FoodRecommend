@@ -14,7 +14,7 @@
           score-template="{value}"
         >
         </el-rate>
-        <span class="price">{{ goodsItem.price_range }}</span>
+        <span class="price">{{ goodsItem.price_range }}￥/人</span>
       </div>
       <!-- <span class="rating">{{ goodsItem.rating }}</span> -->
       <div class="goodinfo-3">
