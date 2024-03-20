@@ -7,12 +7,13 @@ import router from "./router";
 import axios from "axios";
 import dayjs from "dayjs";
 import VueAMap from "vue-amap";
+import "../node_modules/dat.gui/build/dat.gui.js";
+import "../node_modules/dat.gui/build/dat.gui.css";
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(VueRouter);
 Vue.use(VueAMap);
 Vue.prototype.axios = axios;
-axios.defaults.baseURL = "http://loaclhost:3000"; //我电脑问题，你们使用改成http://127.0.0.1
 VueAMap.initAMapApiLoader({
   key: "66be375bbee739346813eda698d5e2c8", //申请的key码需要填写的地方，格式为长串字符数字
   plugin: [

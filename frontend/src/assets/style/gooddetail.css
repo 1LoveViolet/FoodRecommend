@@ -232,3 +232,11 @@
     z-index: 9999;
     /* 使遮罩层位于页面最顶层 */
 }
+
+.totalRevives {
+    display: flex;
+    justify-content: flex-start;
+    font-size: 12px;
+    color: #333;
+    margin: 5px;
+}

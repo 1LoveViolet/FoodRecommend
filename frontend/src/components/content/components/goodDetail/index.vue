@@ -104,7 +104,7 @@
           </el-tab-pane>
         </el-tabs>
       </div>
-
+      <div class="totalRevives">总共有{{ this.showReviews.length }}条评论</div>
       <GoodReview
         v-show="!isAddReview"
         :Reviews="this.showReviews"

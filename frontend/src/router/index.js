@@ -11,6 +11,7 @@ const Register = () => import("views/register/index.vue");
 const Home = () => import("views/home/index.vue");
 const User = () => import("views/user/index.vue");
 const Detail = () => import("components/content/components/goodDetail");
+const Rank = () => import("views/rank/index.vue");
 const router = new VueRouter({
   // mode: "history", // history 模式去除地址栏 # 号
   routes: [
@@ -47,6 +48,11 @@ const router = new VueRouter({
       path: "/home",
       name: "Home",
       component: Home,
+    },
+    {
+      path: "/rank",
+      name: "Rank",
+      component: Rank,
     },
   ],
   mode: "history",

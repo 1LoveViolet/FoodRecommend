@@ -3,6 +3,7 @@
     <div class="positionCity">
       <i class="el-icon-location"></i>{{ positionCity }}
     </div>
+
     <div class="banner">
       <div class="swiper mySwiper">
         <div class="swiper-wrapper">
@@ -14,15 +15,6 @@
             <img :src="item.image_url" alt="" />
             {{ item.name }}
           </div>
-          <!-- <div class="swiper-slide">Slide 2</div>
-        <div class="swiper-slide">Slide 2</div>
-        <div class="swiper-slide">Slide 3</div>
-        <div class="swiper-slide">Slide 4</div>
-        <div class="swiper-slide">Slide 5</div>
-        <div class="swiper-slide">Slide 6</div>
-        <div class="swiper-slide">Slide 7</div>
-        <div class="swiper-slide">Slide 8</div>
-        <div class="swiper-slide">Slide 9</div> -->
         </div>
       </div>
       <div class="welcome">
@@ -48,6 +40,7 @@
         </div>
       </div>
     </div>
+
     <div class="content-head">
       <div class="allcate">
         全部美食分类
@@ -213,6 +206,7 @@ export default {
         console.log("得到处理后的数据", positionInfo);
         // 在这里处理positionInfo的数据
         this.positionCity = positionInfo.addressComponent.city;
+        console.log(this.positionCity);
       })
       .catch((error) => {
         console.error("发生错误", error);
