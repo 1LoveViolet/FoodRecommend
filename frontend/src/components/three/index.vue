@@ -1,5 +1,8 @@
 <template>
-  <div id="tooltip"></div>
+  <div>
+    <div id="tooltip"></div>
+    <div id="tubiao"></div>
+  </div>
 </template>
 
 <script>
@@ -72,6 +75,9 @@ export default {
       raycaster: null,
       INTERSECTED: null,
       stats: null,
+      meshLevel: null,
+      line2Arr: [],
+      flyLineZ: null,
     };
   },
   created() {
@@ -90,8 +96,6 @@ export default {
         method: "get",
       })
         .then((response) => {
-          console.log(response);
-          console.log("this.meshArr", this.meshArr);
           if (this.meshArr.length != 0 && this.lineArr.length != 0) {
             this.scene.remove(...this.meshArr);
             this.scene.remove(...this.lineArr);
@@ -99,27 +103,85 @@ export default {
             this.scene.remove(...this.circleYs);
             this.scene.remove(...this.flyLineArr);
             this.scene.remove(...this.moveSpots);
-            console.log("remove后的数据： ", this.meshArr);
+            // this.scene.remove(...this.line2Arr);
           }
           this.geoJson = response.data;
           this.featuresArr = this.geoJson.features;
           console.log(this.geoJson);
-
-          // selectedScaleDown(geoJson);
+          this.meshLevel = this.geoJson.features[0].properties.level;
+          console.log("this.meshLevel", this.meshLevel);
+          this.selectedScaleDown(this.geoJson);
           this.calcSide(this.geoJson);
           this.fn(this.geoJson);
+          //调整基线z坐标
+          switch (this.meshLevel) {
+            case "province":
+              this.line2Arr.map((item, index) => {
+                item.position.z = -3.4;
+              });
+              this.flyLineZ = 20;
+              break;
+            case "city":
+              this.line2Arr.map((item, index) => {
+                item.position.z = -2.4;
+              });
+              this.flyLineZ = 10;
+              break;
+            case "district":
+              this.line2Arr.map((item, index) => {
+                item.position.z = -1.4;
+              });
+              this.flyLineZ = 3;
+              break;
+            default:
+              break;
+          }
+          // console.log("this.line2Arr", this.line2Arr);
+          // console.log("this.line2.position.z", this.line2.position.z);
           this.meshArr = this.drawMap(this.geoJson);
-          console.log("drawMap之后的this.meshArr", this.meshArr);
+          // console.log("drawMap之后的this.meshArr", this.meshArr);
           this.lineArr = this.drawLine(this.geoJson);
 
-          this.cubeArr = this.cube();
+          // this.cubeArr = this.cube();
+          this.cube();
           this.flyLineArr = this.flyLine(this.meshArr);
           this.flyLine(this.meshArr);
-          console.log(this.meshArr);
-          console.log(this.lineArr);
-          console.log(this.scene);
-          this.cube();
+          switch (this.meshLevel) {
+            case "province":
+              this.cubeArr.map((item, index) => {
+                item.scale.set(1.2, 1.2, 1.2);
+              });
+              this.circleYs.map((item, index) => {
+                item.scale.set(1.2, 1.2, 1.2);
+              });
+              break;
+            case "city":
+              this.cubeArr.map((item, index) => {
+                item.scale.set(0.6, 0.6, 0.6);
+              });
+              this.circleYs.map((item, index) => {
+                item.scale.set(0.6, 0.6, 0.6);
+              });
+              break;
+            case "district":
+              this.cubeArr.map((item, index) => {
+                item.scale.set(0.3, 0.3, 0.3);
+              });
+              this.circleYs.map((item, index) => {
+                item.scale.set(0.3, 0.3, 0.3);
+              });
+              break;
+            default:
+              break;
+          }
+          // console.log(this.meshArr);
+          // console.log(this.lineArr);
+          // console.log(this.scene);
+          console.log("this.cubeArr", this.cubeArr);
+          console.log("this.circleYs", this.circleYs);
           // scene.add(...meshArr);
+
+          this.scene.add(...this.line2Arr);
           this.scene.add(...this.meshArr);
           this.scene.add(...this.lineArr);
           this.scene.add(...this.cubeArr);
@@ -184,7 +246,7 @@ export default {
     render() {
       this.onRay();
       this.renderCircle();
-      this.renderLine(); //移动小球
+      // this.renderLine(); //移动小球
       // arclineAnimate();
       this.renderer.render(this.scene, this.camera);
       this.controls.update();
@@ -276,21 +338,22 @@ export default {
       });
     },
     cube() {
-      let cubeArr = [];
+      this.cubeArr = [];
+      this.circleYs = [];
       this.meshArr.forEach((item, index) => {
-        let geometry = new THREE.SphereGeometry(0.1, 32, 16);
-        let material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-        let sphere = new THREE.Mesh(geometry, material);
-        // 圆环
-        const geometry2 = new THREE.RingGeometry(0.1, 0.11, 50);
-        // transparent 设置 true 开启透明
-        const material2 = new THREE.MeshBasicMaterial({
-          color: 0xff0000,
-          // side: THREE.DoubleSide,
-          transparent: true,
-        });
-        const circleY = new THREE.Mesh(geometry2, material2);
         if (item.center != null) {
+          let geometry = new THREE.SphereGeometry(0.1, 32, 16);
+          let material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+          let sphere = new THREE.Mesh(geometry, material);
+          // 圆环
+          const geometry2 = new THREE.RingGeometry(0.1, 0.11, 50);
+          // transparent 设置 true 开启透明
+          const material2 = new THREE.MeshBasicMaterial({
+            color: 0xff0000,
+            // side: THREE.DoubleSide,
+            transparent: true,
+          });
+          const circleY = new THREE.Mesh(geometry2, material2);
           // item.geometry.computeBoundingSphere();
           // console.log(item.center[0], item.center[1]);
           sphere.position.set(
@@ -302,11 +365,11 @@ export default {
           );
           circleY.position.set(item.center[0], -item.center[1], 0.2);
           this.cubeArr.push(sphere);
-          this.scene.add(circleY);
+          // this.scene.add(circleY);
           this.circleYs.push(circleY);
         }
       });
-      return cubeArr;
+      // return cubeArr;
     },
     flyLine(meshArr) {
       console.log(meshArr[0].center);
@@ -319,7 +382,7 @@ export default {
             new THREE.Vector3(
               (first[0] + item.center[0]) / 2,
               -(first[1] + item.center[1]) / 2,
-              10
+              this.flyLineZ
             ),
             new THREE.Vector3(item.center[0], -item.center[1], 0.2)
           );
@@ -354,7 +417,7 @@ export default {
           const material = new THREE.LineBasicMaterial({
             // vertexColors: THREE.VertexColors,
             vertexColors: true,
-            linewidth: 5,
+            linewidth: 1,
             side: THREE.DoubleSide,
             // color: "#FF7744",
             // color: 0x2e91c2,
@@ -428,6 +491,7 @@ export default {
       console.log(item.adcode);
       this.getGeoJson(item.adcode, this.upz);
     },
+    //获取下砖深度
     selectedScaleDown(geoJson) {
       switch (geoJson.features[0].properties.level) {
         case "province":
@@ -510,6 +574,7 @@ export default {
         .translate([0, 0]);
       // console.log(merTrans);
     },
+    //绘制二维地图用于拉伸成3d
     drawPlan(lonlatArr) {
       // 可以理解为canvas的绘制形状，moveTo、lineTo
       const shap = new THREE.Shape();
@@ -533,6 +598,7 @@ export default {
     addmesh(lonlatArr) {
       // console.log(lonlatArr);
       const shap = this.drawPlan(lonlatArr);
+
       // 几何体
       const geo = new THREE.ExtrudeGeometry(shap, this.extrudeSettings);
       geo.rotateX(Math.PI);
@@ -550,6 +616,9 @@ export default {
       // material.backup = material.color.getHex();
       // 物体
       const mesh = new THREE.Mesh(geo, material);
+      // 获取顶点数组
+      // var vertices = geo.getAttribute("position").array;
+      // console.log("获取顶点数组vertices", vertices);
       return mesh;
     },
     addLine(lonlatArr) {
@@ -593,6 +662,7 @@ export default {
 
       return meshArray;
     },
+    //只执行一次函数
     once(fn) {
       let caller = true;
       return function () {
@@ -602,20 +672,35 @@ export default {
         }
       };
     },
+    //地图基线
     drawBasicLine(geoJson) {
       const { features } = geoJson;
       features.forEach((feature) => {
         this.dealWithCoord(feature.geometry, (lonlatArr) => {
           let line2 = this.addLine(lonlatArr);
-          // console.log(line2);
           line2.material.color.r = 0;
           line2.material.color.g = 0;
           line2.material.color.b = 0;
-          line2.position.z = -3;
-          this.scene.add(line2);
+          // switch (this.meshLevel) {
+          //   case "province":
+          //     this.line2.position.z = -3.4;
+          //     break;
+          //   case "city":
+          //     this.line2.position.z = -2.4;
+          //     break;
+          //   case "district":
+          //     this.line2.position.z = -1.4;
+          //     break;
+          //   default:
+          //     break;
+          // }
+          line2.position.z = -3.4;
+          // this.scene.add(this.line2);
+          this.line2Arr.push(line2);
         });
       });
     },
+    //模型上地图线
     drawLine(geoJson) {
       const lineArray = [];
       const { features } = geoJson;
@@ -646,6 +731,7 @@ export default {
         this.mouseY = _event.clientY;
       });
     },
+    //相机看向
     cameraLookAt(x, y) {
       this.controls.target.set(x, -y, 0);
       this.v = new THREE.Vector3(x, -y, 0);
@@ -703,6 +789,14 @@ body {
   background: #fff;
   /* 解决当鼠标移动到tooltip元素上时候停顿的问题 */
   pointer-events: none;
+}
+#tubiao {
+  width: 100px;
+  height: 100px;
+  background-color: aquamarine;
+  position: absolute;
+  left: 100px;
+  top: 100px;
 }
 /* .box {
   width: 100px;
