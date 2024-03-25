@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    position: relative;
+    /* background: url("./img/mapback.png") center no-repeat;
+    background-size: cover; */
+    transition: all 0.3s;
+}
+
+#tooltip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 6px;
+    border-radius: 4px;
+    display: none;
+    background: #fff;
+    /* 解决当鼠标移动到tooltip元素上时候停顿的问题 */
+    pointer-events: none;
+}
+
+#tubiao {
+    width: 400px;
+    height: 50px;
+    background-color: aquamarine;
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    left: 100px;
+    top: 10px;
+}
+
+/* .box {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    background-color: aqua;
+  } */

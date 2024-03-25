@@ -1,7 +1,35 @@
 <template>
   <div>
     <div id="tooltip"></div>
-    <div id="tubiao"></div>
+    <div id="tubiao">
+      <el-button
+        type="primary"
+        round
+        v-if="meshLevel !== 'province' && prevLevel.length !== 0"
+        @click="toprevLevel"
+        >上一级</el-button
+      >
+      <el-button
+        type="primary"
+        round
+        v-if="meshLevel !== 'district' && nextLevel.length !== 0"
+        @click="tonextLevel"
+        >下一级</el-button
+      >
+      <el-button type="primary" round v-if="isflyline" @click="hiddenFlyLine"
+        >隐藏飞线</el-button
+      >
+      <el-button type="primary" round v-else @click="showFlyLine"
+        >显示飞线</el-button
+      >
+
+      <el-button type="primary" round v-if="isCube" @click="hiddenCube"
+        >隐藏中心城市</el-button
+      >
+      <el-button type="primary" round v-else @click="showCube"
+        >显示中心城市</el-button
+      >
+    </div>
   </div>
 </template>
 
@@ -78,6 +106,11 @@ export default {
       meshLevel: null,
       line2Arr: [],
       flyLineZ: null,
+      nowadcode: null,
+      isflyline: true,
+      isCube: true,
+      prevLevel: [],
+      nextLevel: [],
     };
   },
   created() {
@@ -90,7 +123,52 @@ export default {
     this.start();
   },
   methods: {
+    hiddenFlyLine() {
+      this.scene.remove(...this.flyLineArr);
+      this.isflyline = false;
+    },
+    showFlyLine() {
+      this.scene.add(...this.flyLineArr);
+      this.isflyline = true;
+    },
+    hiddenCube() {
+      this.scene.remove(...this.cubeArr);
+      this.scene.remove(...this.circleYs);
+      this.isCube = false;
+    },
+    showCube() {
+      this.scene.add(...this.cubeArr);
+      this.scene.add(...this.circleYs);
+      this.isCube = true;
+    },
+    toprevLevel() {
+      if (this.meshLevel == "city") {
+        let meshLevel = this.meshLevel;
+        let adcode = this.nowadcode;
+        this.nextLevel[0] = { meshLevel: meshLevel, adcode: adcode };
+      }
+      if (this.meshLevel == "district") {
+        let meshLevel = this.meshLevel;
+        let adcode = this.nowadcode;
+        this.nextLevel[1] = { meshLevel: meshLevel, adcode: adcode };
+      }
+      if (this.meshLevel == "city" && this.prevLevel[0]) {
+        this.getGeoJson(this.prevLevel[0].adcode, this.upz);
+      }
+      if (this.meshLevel == "district" && this.prevLevel[1]) {
+        this.getGeoJson(this.prevLevel[1].adcode, this.upz);
+      }
+    },
+    tonextLevel() {
+      if (this.meshLevel == "province" && this.nextLevel[0]) {
+        this.getGeoJson(this.nextLevel[0].adcode, this.upz);
+      }
+      if (this.meshLevel == "city" && this.nextLevel[1]) {
+        this.getGeoJson(this.nextLevel[1].adcode, this.upz);
+      }
+    },
     getGeoJson(adcode, upz) {
+      this.nowadcode = adcode;
       this.axios({
         url: `https://geo.datav.aliyun.com/areas_v3/bound/geojson?code=${adcode}_full`,
         method: "get",
@@ -190,6 +268,28 @@ export default {
         .catch(function (err) {
           console.log(err);
         });
+    },
+    getprovinceJson(item) {
+      if (
+        item.adcode !== this.prevLevel[0].adcode &&
+        item.adcode !== this.prevLevel[1].adcode &&
+        item.adcode !== this.nextLevel[0].adcode &&
+        item.adcode !== this.nextLevel[1].adcode
+      ) {
+        this.prevLevel = [];
+        this.nextLevel = [];
+      }
+      if (this.meshLevel == "province") {
+        let meshLevel = this.meshLevel;
+        let adcode = this.nowadcode;
+        this.prevLevel[0] = { meshLevel: meshLevel, adcode: adcode };
+      }
+      if (this.meshLevel == "city") {
+        let meshLevel = this.meshLevel;
+        let adcode = this.nowadcode;
+        this.prevLevel[1] = { meshLevel: meshLevel, adcode: adcode };
+      }
+      this.getGeoJson(item.adcode, this.upz);
     },
     // 初始化场景
     initScene() {
@@ -487,10 +587,6 @@ export default {
         this.fn.flag = 1;
       }
     },
-    getprovinceJson(item) {
-      console.log(item.adcode);
-      this.getGeoJson(item.adcode, this.upz);
-    },
     //获取下砖深度
     selectedScaleDown(geoJson) {
       switch (geoJson.features[0].properties.level) {
@@ -770,40 +866,4 @@ export default {
   },
 };
 </script>
-
-<style>
-body {
-  margin: 0;
-  position: relative;
-  /* background: url("./img/mapback.png") center no-repeat;
-  background-size: cover; */
-  transition: all 0.3s;
-}
-#tooltip {
-  position: absolute;
-  left: 0;
-  top: 0;
-  padding: 6px;
-  border-radius: 4px;
-  display: none;
-  background: #fff;
-  /* 解决当鼠标移动到tooltip元素上时候停顿的问题 */
-  pointer-events: none;
-}
-#tubiao {
-  width: 100px;
-  height: 100px;
-  background-color: aquamarine;
-  position: absolute;
-  left: 100px;
-  top: 100px;
-}
-/* .box {
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  top: 100px;
-  left: 100px;
-  background-color: aqua;
-} */
-</style>
+<style src="@/assets/style/three.css"  scoped></style>
