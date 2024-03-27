@@ -45,6 +45,11 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import * as d3 from "d3";
 import axios from "network/axios";
+//引入获取实例
+import { AMapManager } from "vue-amap";
+let amapManager = new AMapManager();
+import { searchAllRestaurants } from "api/good";
+import { searchUserById } from "api/user";
 export default {
   data() {
     const gui = new dat.GUI();
@@ -111,9 +116,21 @@ export default {
       isCube: true,
       prevLevel: [],
       nextLevel: [],
+      // 设置评分和价格范围的阈值
+      ratingThreshold: 0.3, // 评分差距阈值
+      priceRangeThreshold: 50, // 价格范围差距阈值
+      favorites: [],
+      reviews: [],
+      userFavorites: [],
+      hotGoods: [],
+      showGoods: [],
+      hotcubeArr: [],
+      hotLineArr: [],
     };
   },
   created() {
+    this.getAllRestaurantInfo();
+    this.searchUserByIdmethod();
     this.getGeoJson(100000);
   },
   mounted() {
@@ -123,6 +140,96 @@ export default {
     this.start();
   },
   methods: {
+    restaurantSprite() {
+      this.hotcubeArr = [];
+      this.hotLineArr = [];
+      if (this.meshLevel == "district") {
+        this.hotGoods.map((item, index) => {
+          console.log("item", item);
+          item.position = this.merTrans(item.position);
+          console.log("item.position", item.position);
+          // 使用纹理加载器加载雪花图片
+          const texture = new THREE.TextureLoader().load(item.image_url);
+          // 精灵材质
+          const spriteMaterial = new THREE.SpriteMaterial({
+            map: texture,
+          });
+          const group = new THREE.Group();
+          // 循环创建精灵，并利用随机函数来设置每个精灵x、y、z的位置
+          // 精灵
+          const sprite = new THREE.Sprite(spriteMaterial);
+          // 添加到组
+          group.add(sprite);
+          // 设置精灵缩放比例
+          sprite.scale.set(1, 1, 1);
+          // 设置精灵模型位置，在长方体空间上随机分布
+          const x = item.position[0];
+          const y = -item.position[1];
+          const z = 2;
+          sprite.position.set(x, y, z);
+          this.scene.add(group);
+
+          let geometry = new THREE.SphereGeometry(0.1, 32, 16);
+          let material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+          let sphere = new THREE.Mesh(geometry, material);
+          sphere.position.set(
+            // item.geometry.boundingSphere.center.x,
+            // item.geometry.boundingSphere.center.y,
+            item.position[0],
+            -item.position[1],
+            0.2
+          );
+          sphere.scale.set(0.2, 0.2, 0.2);
+          this.hotcubeArr.push(sphere);
+          this.scene.add(...this.hotcubeArr);
+
+          const curve = new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3(item.position[0], -item.position[1], 0.2),
+            new THREE.Vector3(item.position[0], -item.position[1], 0.5),
+            new THREE.Vector3(x, y, 2)
+          );
+          // console.log(curve);
+          const points = curve.getPoints(50);
+          //   this.moveLine(curve);
+          const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+          // line.geometry = lineGeometry;
+          // 获取曲线 上的50个点
+          var positions = [];
+          var colors = [];
+          var color = new THREE.Color();
+
+          // 给每个顶点设置演示 实现渐变
+          for (var j = 0; j < points.length; j++) {
+            color.setHSL(3 + j, 1, 0.5 + j * 0.0025); // 粉色
+            colors.push(color.r, color.g, color.b);
+            positions.push(points[j].x, points[j].y, points[j].z);
+          }
+          // 放入顶点 和 设置顶点颜色
+          // console.log(positions);
+          // console.log(colors);
+          lineGeometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(new Float32Array(positions), 3)
+          );
+          lineGeometry.setAttribute(
+            "color",
+            new THREE.BufferAttribute(new Float32Array(colors), 3)
+          );
+
+          const materialhotline = new THREE.LineBasicMaterial({
+            // vertexColors: THREE.VertexColors,
+            vertexColors: true,
+            linewidth: 1,
+            side: THREE.DoubleSide,
+            // color: "#FF7744",
+            // color: 0x2e91c2,
+          });
+          const hotline = new THREE.Line(lineGeometry, materialhotline);
+          this.hotLineArr.push(hotline);
+          this.scene.add(...this.hotLineArr);
+        });
+      }
+    },
     hiddenFlyLine() {
       this.scene.remove(...this.flyLineArr);
       this.isflyline = false;
@@ -186,8 +293,12 @@ export default {
           this.geoJson = response.data;
           this.featuresArr = this.geoJson.features;
           console.log(this.geoJson);
-          this.meshLevel = this.geoJson.features[0].properties.level;
-          console.log("this.meshLevel", this.meshLevel);
+          if (this.geoJson.features[0].properties.level) {
+            this.meshLevel = this.geoJson.features[0].properties.level;
+            console.log("this.meshLevel", this.meshLevel);
+          } else {
+            console.log("层级不能再低了");
+          }
           this.selectedScaleDown(this.geoJson);
           this.calcSide(this.geoJson);
           this.fn(this.geoJson);
@@ -224,6 +335,7 @@ export default {
           this.cube();
           this.flyLineArr = this.flyLine(this.meshArr);
           this.flyLine(this.meshArr);
+          this.restaurantSprite();
           switch (this.meshLevel) {
             case "province":
               this.cubeArr.map((item, index) => {
@@ -258,7 +370,6 @@ export default {
           console.log("this.cubeArr", this.cubeArr);
           console.log("this.circleYs", this.circleYs);
           // scene.add(...meshArr);
-
           this.scene.add(...this.line2Arr);
           this.scene.add(...this.meshArr);
           this.scene.add(...this.lineArr);
@@ -270,15 +381,6 @@ export default {
         });
     },
     getprovinceJson(item) {
-      if (
-        item.adcode !== this.prevLevel[0].adcode &&
-        item.adcode !== this.prevLevel[1].adcode &&
-        item.adcode !== this.nextLevel[0].adcode &&
-        item.adcode !== this.nextLevel[1].adcode
-      ) {
-        this.prevLevel = [];
-        this.nextLevel = [];
-      }
       if (this.meshLevel == "province") {
         let meshLevel = this.meshLevel;
         let adcode = this.nowadcode;
@@ -289,7 +391,9 @@ export default {
         let adcode = this.nowadcode;
         this.prevLevel[1] = { meshLevel: meshLevel, adcode: adcode };
       }
-      this.getGeoJson(item.adcode, this.upz);
+      if (this.meshLevel !== "district") {
+        this.getGeoJson(item.adcode, this.upz);
+      }
     },
     // 初始化场景
     initScene() {
@@ -676,6 +780,7 @@ export default {
       const shap = new THREE.Shape();
       lonlatArr.forEach((lonlat, index) => {
         // console.log(lonlatArr[0]);
+        // console.log("this.merTrans(lonlat)", lonlat);
         const [x, y] = this.merTrans(lonlat);
         if (!index) shap.moveTo(x, y);
         else shap.lineTo(x, y);
@@ -862,6 +967,187 @@ export default {
       //   this.createPlane();
       // mousemove();
       this.render();
+    },
+    getAllRestaurantInfo() {
+      searchAllRestaurants().then((res) => {
+        this.showGoods = res.data;
+        this.comprehensiveSort(
+          this.showGoods,
+          this.favorites,
+          this.userFavorites,
+          this.ratingThreshold,
+          this.priceRangeThreshold
+        );
+        this.getHotGoods();
+        this.showHotGoods();
+        console.log("this.showGoods", this.showGoods);
+        console.log("this.hotGoods", this.hotGoods);
+      });
+    },
+    comprehensiveSort(
+      shops,
+      favorites,
+      userFavorites,
+      ratingThreshold,
+      priceRangeThreshold
+    ) {
+      console.log("shops: ", shops);
+      // 计算每个商家的初始权重值
+      shops.forEach((shop) => {
+        shop.weight = shop.rating * 0.2; // 初始权重为 (5 - rating) * 0.1
+      });
+
+      // 根据 price_range 使用 sort 排序，价格越低排名越高
+      shops.sort((a, b) => b.price_range - a.price_range);
+
+      // 计算 price_range 权重叠加值
+      let priceRangeWeight = 0;
+      let lastPriceRange = null;
+      shops.forEach((shop) => {
+        if (lastPriceRange === null || shop.price_range !== lastPriceRange) {
+          priceRangeWeight += 0.01;
+        }
+        shop.weight += priceRangeWeight;
+        lastPriceRange = shop.price_range;
+      });
+
+      // 计算 cuisine 和 category 权重叠加值
+      shops.forEach((shop) => {
+        // console.log(shop.restaurant_id);
+        if (userFavorites.includes(shop.restaurant_id)) {
+          // console.log("用户收藏商家权重加0.02");
+          shop.weight += 0.1; // 用户收藏商家权重加0.02
+        } else {
+          // console.log("用户收藏没有这个");
+        }
+        favorites.forEach((favorite) => {
+          // console.log("shop.cuisine: ", shop.cuisine);
+          // console.log("shop.category: ", shop.category);
+          // console.log("favorite.cuisine: ", favorite.cuisine);
+          // console.log("favorite.category: ", favorite.category);
+
+          if (
+            shop.category == favorite.category &&
+            shop.cuisine == favorite.cuisine
+          ) {
+            shop.weight += 0.1; // 用户收藏商家的category cuisine相同的其他商家权重加0.01
+            // console.log("加了0.02");
+          } else if (shop.category == favorite.category) {
+            shop.weight += 0.05; // 用户收藏商家的category 相同的其他商家权重加0.01
+            // console.log("加了0.015");
+          } else if (shop.cuisine == favorite.cuisine) {
+            shop.weight += 0.05; // 用户收藏商家的 cuisine  相同的其他商家权重加0.01
+            // console.log("加了0.01");
+          } else {
+            // console.log("商家的cuisineh和category和收藏的商家不同");
+          }
+        });
+      });
+
+      // 如果 rating 或 price_range 差距到达阈值，特殊处理
+      shops.forEach((shop) => {
+        shops.forEach((otherShop) => {
+          if (shop.id !== otherShop.id) {
+            const ratingDifference = Math.abs(shop.rating - otherShop.rating);
+            const priceRangeDifference = Math.abs(
+              shop.price_range - otherShop.price_range
+            );
+            if (
+              ratingDifference >= ratingThreshold &&
+              priceRangeDifference >= priceRangeThreshold
+            ) {
+              // 对于 rating 或 price_range 差距到达阈值的商家，权重加上一个固定值
+              shop.weight += 0;
+            }
+          }
+        });
+      });
+
+      // 按照权重值和名称排序
+      shops.sort((a, b) => {
+        if (a.weight !== b.weight) {
+          return b.weight - a.weight;
+        } else {
+          return a.name.localeCompare(b.name);
+        }
+      });
+
+      // 打印排序后的权重值数组
+      const weights = shops.map((shop) => shop.weight);
+      console.log(weights);
+    },
+    searchUserByIdmethod() {
+      if (this.$store.state.user[0].user_id) {
+        console.log("执行了searchUserByIdmethod函数");
+        searchUserById(this.$store.state.user[0].user_id).then((res) => {
+          this.favorites = [];
+          console.log(res);
+          let Arr = res.data;
+          Arr.forEach((item) => {
+            switch (item.table_type) {
+              case "favorites":
+                // this.user.favorites = [];
+                this.favorites.push(item);
+                break;
+              case "reviews":
+                // this.user.favorites = [];
+                this.reviews.push(item);
+                break;
+              default:
+                break;
+            }
+          });
+          console.log("this.favorites: ", this.favorites);
+          this.favorites.forEach((item) => {
+            this.userFavorites.push(item.restaurant_id);
+          });
+          console.log("this.userFavorites: ", this.userFavorites);
+        });
+      } else {
+        console.log(
+          "this.$store.state.user",
+          this.$store.state.user[0].user_id
+        );
+        console.log("用户没登录，没有this.$store.state.user.user_id");
+      }
+    },
+    getHotGoods() {
+      this.hotGoods = [];
+      this.showGoods.map((item, index) => {
+        if (index <= 6) {
+          this.hotGoods.push(item);
+        }
+      });
+      this.showHotGoods();
+    },
+    showHotGoods() {
+      this.hotGoods.map((item, index) => {
+        this.onSearchAddress(item);
+      });
+      console.log("添加经纬度后的this.hotGoods", this.hotGoods);
+      // console.log("item", item);
+      // console.log("item.position", item.position);
+      // // console.log("item.position", item.position[0]);
+      // // console.log("item.position", item.position[1]);
+      // const [x, y] = this.merTrans([103.519789, 30.193454]);
+      // console.log([x, y]);
+    },
+    onSearchAddress(item) {
+      console.log(" onSearchAddress方法的e:", item);
+      AMap.plugin("AMap.Geocoder", () => {
+        var geocoder = new AMap.Geocoder({
+          // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+          city: this.$store.state.position,
+        });
+        geocoder.getLocation(item.address, (status, result) => {
+          if (status === "complete" && result.info === "OK") {
+            item.position = [
+              result.geocodes[0].location.lng,
+              result.geocodes[0].location.lat,
+            ];
+          }
+        });
+      });
     },
   },
 };

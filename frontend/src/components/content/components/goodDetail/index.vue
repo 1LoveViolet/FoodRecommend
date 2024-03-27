@@ -46,7 +46,7 @@
             地址：{{ restaurantInfo[0].address }}
             <i
               class="el-icon-location"
-              @click="onSearchAddress(scope.row.duAddress)"
+              @click="onSearchAddress(scope.row.address)"
             >
             </i>
           </div>
@@ -432,15 +432,20 @@ export default {
     onSearchAddress(e) {
       this.dialogVisible = true;
       console.log(" onSearchAddress方法的e:", e);
+      let position = null;
       AMap.plugin("AMap.Geocoder", () => {
         var geocoder = new AMap.Geocoder({
           // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
-          city: "成都市",
+          city: this.$store.state.position,
         });
         geocoder.getLocation(e, (status, result) => {
           console.log("getLocation的status:", status);
           console.log("getLocation的result:", result);
           if (status === "complete" && result.info === "OK") {
+            position = {
+              lnt: result.geocodes[0].location.lng,
+              lat: result.geocodes[0].location.lat,
+            };
             // result中对应详细地理坐标信息
             this.center = [
               result.geocodes[0].location.lng,

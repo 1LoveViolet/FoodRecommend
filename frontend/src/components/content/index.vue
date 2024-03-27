@@ -206,6 +206,7 @@ export default {
         console.log("得到处理后的数据", positionInfo);
         // 在这里处理positionInfo的数据
         this.positionCity = positionInfo.addressComponent.city;
+        this.$store.dispatch("setPositionCity", this.positionCity);
         console.log(this.positionCity);
       })
       .catch((error) => {

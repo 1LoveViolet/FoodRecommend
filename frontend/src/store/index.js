@@ -13,6 +13,7 @@ export default new Vuex.Store({
     },
     token: null,
     isLogin: false,
+    positionCity: null,
   },
   mutations: {
     changeisLogin(state) {
@@ -42,6 +43,9 @@ export default new Vuex.Store({
     },
     clearToken(state) {
       state.token = null;
+    },
+    setPositionCity(state, positionCity) {
+      state.positionCity = positionCity;
     },
   },
   actions: {
@@ -73,6 +77,9 @@ export default new Vuex.Store({
     },
     clearToken(context) {
       context.commit("clearToken");
+    },
+    setPositionCity(context, positionCity) {
+      context.commit("setPositionCity", positionCity);
     },
   },
   plugins: [
