@@ -29,6 +29,21 @@
       <el-button type="primary" round v-else @click="showCube"
         >显示中心城市</el-button
       >
+
+      <el-button
+        type="primary"
+        round
+        v-if="isHotGoods && spriteGroup.length !== 0"
+        @click="hiddensprite"
+        >隐藏热门商家</el-button
+      >
+      <el-button
+        type="primary"
+        round
+        v-else-if="!isHotGoods && spriteGroup.length !== 0"
+        @click="showsprite"
+        >显示热门商家</el-button
+      >
     </div>
   </div>
 </template>
@@ -50,6 +65,7 @@ import { AMapManager } from "vue-amap";
 let amapManager = new AMapManager();
 import { searchAllRestaurants } from "api/good";
 import { searchUserById } from "api/user";
+import { SimplexNoise } from "three/examples/jsm/math/SimplexNoise";
 export default {
   data() {
     const gui = new dat.GUI();
@@ -124,8 +140,10 @@ export default {
       userFavorites: [],
       hotGoods: [],
       showGoods: [],
+      isHotGoods: true,
       hotcubeArr: [],
       hotLineArr: [],
+      spriteGroup: [],
     };
   },
   created() {
@@ -138,97 +156,184 @@ export default {
     document.body.appendChild(this.stats.dom);
     window.addEventListener("click", this.click);
     this.start();
+    // this.scene.add(...this.spriteGroup);
+    // this.scene.add(...this.hotcubeArr);
+    // this.scene.add(...this.hotLineArr);
   },
   methods: {
     restaurantSprite() {
       this.hotcubeArr = [];
       this.hotLineArr = [];
-      if (this.meshLevel == "district") {
-        this.hotGoods.map((item, index) => {
-          console.log("item", item);
-          item.position = this.merTrans(item.position);
-          console.log("item.position", item.position);
-          // 使用纹理加载器加载雪花图片
-          const texture = new THREE.TextureLoader().load(item.image_url);
-          // 精灵材质
-          const spriteMaterial = new THREE.SpriteMaterial({
-            map: texture,
-          });
-          const group = new THREE.Group();
-          // 循环创建精灵，并利用随机函数来设置每个精灵x、y、z的位置
-          // 精灵
-          const sprite = new THREE.Sprite(spriteMaterial);
-          // 添加到组
-          group.add(sprite);
-          // 设置精灵缩放比例
-          sprite.scale.set(1, 1, 1);
-          // 设置精灵模型位置，在长方体空间上随机分布
-          const x = item.position[0];
-          const y = -item.position[1];
-          const z = 2;
-          sprite.position.set(x, y, z);
-          this.scene.add(group);
-
-          let geometry = new THREE.SphereGeometry(0.1, 32, 16);
-          let material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-          let sphere = new THREE.Mesh(geometry, material);
-          sphere.position.set(
-            // item.geometry.boundingSphere.center.x,
-            // item.geometry.boundingSphere.center.y,
-            item.position[0],
-            -item.position[1],
-            0.2
-          );
-          sphere.scale.set(0.2, 0.2, 0.2);
-          this.hotcubeArr.push(sphere);
-          this.scene.add(...this.hotcubeArr);
-
-          const curve = new THREE.QuadraticBezierCurve3(
-            new THREE.Vector3(item.position[0], -item.position[1], 0.2),
-            new THREE.Vector3(item.position[0], -item.position[1], 0.5),
-            new THREE.Vector3(x, y, 2)
-          );
-          // console.log(curve);
-          const points = curve.getPoints(50);
-          //   this.moveLine(curve);
-          const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-          // line.geometry = lineGeometry;
-          // 获取曲线 上的50个点
-          var positions = [];
-          var colors = [];
-          var color = new THREE.Color();
-
-          // 给每个顶点设置演示 实现渐变
-          for (var j = 0; j < points.length; j++) {
-            color.setHSL(3 + j, 1, 0.5 + j * 0.0025); // 粉色
-            colors.push(color.r, color.g, color.b);
-            positions.push(points[j].x, points[j].y, points[j].z);
-          }
-          // 放入顶点 和 设置顶点颜色
-          // console.log(positions);
-          // console.log(colors);
-          lineGeometry.setAttribute(
-            "position",
-            new THREE.BufferAttribute(new Float32Array(positions), 3)
-          );
-          lineGeometry.setAttribute(
-            "color",
-            new THREE.BufferAttribute(new Float32Array(colors), 3)
-          );
-
-          const materialhotline = new THREE.LineBasicMaterial({
-            // vertexColors: THREE.VertexColors,
-            vertexColors: true,
-            linewidth: 1,
-            side: THREE.DoubleSide,
-            // color: "#FF7744",
-            // color: 0x2e91c2,
-          });
-          const hotline = new THREE.Line(lineGeometry, materialhotline);
-          this.hotLineArr.push(hotline);
-          this.scene.add(...this.hotLineArr);
+      // if (this.meshLevel == "district") {
+      this.hotGoods.map((item, index) => {
+        console.log("item", item);
+        item.position = this.merTrans(item.position);
+        console.log("item.position", item.position);
+        // 使用纹理加载器加载图片
+        const texture = new THREE.TextureLoader().load(item.image_url);
+        // 精灵材质
+        const spriteMaterial = new THREE.SpriteMaterial({
+          map: texture,
         });
-      }
+        // 精灵
+        const sprite = new THREE.Sprite(spriteMaterial);
+        // 添加到组
+        this.spriteGroup.push(sprite);
+        var position = this.generateSpritePosition(); // 获取生成的位置向量
+        // console.log("sprite获取生成的位置向量", position);
+        sprite.position.copy(position);
+        sprite.scale.set(0.5, 0.5, 0.5);
+        // console.log("this.spriteGroup", this.spriteGroup);
+        // this.scene.add(...this.spriteGroup);
+        let geometry = new THREE.SphereGeometry(0.1, 32, 16);
+        let material = new THREE.MeshBasicMaterial({ color: 0x1111ff });
+        let sphere = new THREE.Mesh(geometry, material);
+        sphere.position.set(item.position[0], -item.position[1], 0.2);
+        sphere.scale.set(0.2, 0.2, 0.2);
+        this.hotcubeArr.push(sphere);
+        // this.scene.add(...this.hotcubeArr);
+
+        const curve = new THREE.QuadraticBezierCurve3(
+          new THREE.Vector3(item.position[0], -item.position[1], 0.2),
+          new THREE.Vector3(position.x, position.y, 1),
+          new THREE.Vector3(position.x, position.y, position.z)
+        );
+        // console.log(curve);
+        const points = curve.getPoints(50);
+        //   this.moveLine(curve);
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        // line.geometry = lineGeometry;
+        // 获取曲线 上的50个点
+        var positions = [];
+        var colors = [];
+
+        // 给每个顶点设置演示 实现渐变
+        for (var j = 0; j < points.length; j++) {
+          var color = new THREE.Color(); // 创建新的 Color 对象
+          var hue = j / points.length; // 色相从蓝色到白色渐变
+          var saturation = 1; // 饱和度保持不变
+          var lightness = 0.5 + (j * 0.5) / points.length; // 亮度从0.5到1渐变
+
+          color.setHSL(hue, saturation, lightness); // 设置颜色
+          colors.push(color.r, color.g, color.b); // 将颜色值添加到数组中
+          positions.push(points[j].x, points[j].y, points[j].z);
+        }
+        // 放入顶点 和 设置顶点颜色
+        // console.log(positions);
+        // console.log(colors);
+        lineGeometry.setAttribute(
+          "position",
+          new THREE.BufferAttribute(new Float32Array(positions), 3)
+        );
+        lineGeometry.setAttribute(
+          "color",
+          new THREE.BufferAttribute(new Float32Array(colors), 3)
+        );
+
+        const materialhotline = new THREE.LineBasicMaterial({
+          // vertexColors: THREE.VertexColors,
+          vertexColors: true,
+          linewidth: 1,
+          side: THREE.DoubleSide,
+          // color: "#FF7744",
+          // color: 0x2e91c2,
+        });
+        const hotline = new THREE.Line(lineGeometry, materialhotline);
+        this.hotLineArr.push(hotline);
+        // this.scene.add(...this.hotLineArr);
+        this.scene.add(...this.spriteGroup);
+        this.scene.add(...this.hotcubeArr);
+        this.scene.add(...this.hotLineArr);
+      });
+      // }
+    },
+    generateSpritePosition() {
+      var bounds = this.getMeshGroupBounds(this.meshArr);
+      let maxX = bounds.maxX;
+      let minX = bounds.minX;
+      let maxY = bounds.maxY;
+      let minY = bounds.minY;
+      let minZ = 1.8; // Z 坐标最小值
+      let maxZ = 2.3; // Z 坐标最大值
+      console.log("X 范围:", bounds.minX, "-", bounds.maxX);
+      console.log("Y 范围:", bounds.minY, "-", bounds.maxY);
+      let simplexNoise = new SimplexNoise();
+      let a = this.map(
+        simplexNoise.noise3d(Math.random(), Math.random(), Math.random()),
+        -1,
+        1,
+        minX,
+        maxX
+      );
+      let b = this.map(
+        simplexNoise.noise3d(Math.random(), Math.random(), Math.random()),
+        -1,
+        1,
+        minY,
+        maxY
+      );
+      let c = this.map(
+        simplexNoise.noise3d(Math.random(), Math.random(), Math.random()),
+        -1,
+        1,
+        minZ,
+        maxZ
+      );
+      let position = new THREE.Vector3(a, b, c);
+      console.log("generateSpritePosition返回的坐标", position);
+      return position;
+    },
+    // 映射函数
+    map(value, min1, max1, min2, max2) {
+      return min2 + ((value - min1) * (max2 - min2)) / (max1 - min1);
+    },
+    getXtoY() {
+      var bounds = this.getMeshGroupBounds(this.meshArr);
+      console.log("X 范围:", bounds.minX, "-", bounds.maxX);
+      console.log("Y 范围:", bounds.minY, "-", bounds.maxY);
+    },
+    getMeshGroupBounds(meshArr) {
+      var minX = Infinity;
+      var maxX = -Infinity;
+      var minY = Infinity;
+      var maxY = -Infinity;
+
+      meshArr.forEach(function (model) {
+        model.traverse(function (child) {
+          if (child instanceof THREE.Mesh) {
+            var positions = child.geometry.attributes.position.array;
+            for (var i = 0; i < positions.length; i += 3) {
+              var x = positions[i];
+              var y = positions[i + 1];
+              // 更新范围值
+              minX = Math.min(minX, x);
+              maxX = Math.max(maxX, x);
+              minY = Math.min(minY, y);
+              maxY = Math.max(maxY, y);
+            }
+          }
+        });
+      });
+
+      return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
+    },
+    hiddensprite() {
+      console.log("this.spriteGroup", this.spriteGroup);
+      console.log("this.hotcubeArr", this.hotcubeArr);
+      console.log("this.hotLineArr", this.hotLineArr);
+      this.scene.remove(...this.spriteGroup);
+      this.scene.remove(...this.hotcubeArr);
+      this.scene.remove(...this.hotLineArr);
+      this.isHotGoods = false;
+    },
+    showsprite() {
+      console.log("this.spriteGroup", this.spriteGroup);
+      console.log("this.hotcubeArr", this.hotcubeArr);
+      console.log("this.hotLineArr", this.hotLineArr);
+      this.scene.add(...this.spriteGroup);
+      this.scene.add(...this.hotcubeArr);
+      this.scene.add(...this.hotLineArr);
+      this.isHotGoods = true;
     },
     hiddenFlyLine() {
       this.scene.remove(...this.flyLineArr);
@@ -264,6 +369,10 @@ export default {
       }
       if (this.meshLevel == "district" && this.prevLevel[1]) {
         this.getGeoJson(this.prevLevel[1].adcode, this.upz);
+        this.scene.remove(...this.spriteGroup);
+        this.scene.remove(...this.hotcubeArr);
+        this.scene.remove(...this.hotLineArr);
+        this.isHotGoods = false;
       }
     },
     tonextLevel() {
@@ -328,14 +437,13 @@ export default {
           // console.log("this.line2Arr", this.line2Arr);
           // console.log("this.line2.position.z", this.line2.position.z);
           this.meshArr = this.drawMap(this.geoJson);
-          // console.log("drawMap之后的this.meshArr", this.meshArr);
+          console.log("drawMap之后的this.meshArr", this.meshArr);
           this.lineArr = this.drawLine(this.geoJson);
 
           // this.cubeArr = this.cube();
           this.cube();
           this.flyLineArr = this.flyLine(this.meshArr);
           this.flyLine(this.meshArr);
-          this.restaurantSprite();
           switch (this.meshLevel) {
             case "province":
               this.cubeArr.map((item, index) => {
@@ -370,11 +478,20 @@ export default {
           console.log("this.cubeArr", this.cubeArr);
           console.log("this.circleYs", this.circleYs);
           // scene.add(...meshArr);
+          if (adcode == 510100) {
+            this.once(this.restaurantSprite());
+          }
           this.scene.add(...this.line2Arr);
           this.scene.add(...this.meshArr);
           this.scene.add(...this.lineArr);
-          this.scene.add(...this.cubeArr);
-          this.scene.add(...this.flyLineArr);
+          if (this.isCube) {
+            this.scene.add(...this.cubeArr);
+          }
+          if (this.isflyline) {
+            this.scene.add(...this.flyLineArr);
+          }
+          // this.scene.add(...this.cubeArr);
+          // this.scene.add(...this.flyLineArr);
         })
         .catch(function (err) {
           console.log(err);
@@ -576,7 +693,7 @@ export default {
       // return cubeArr;
     },
     flyLine(meshArr) {
-      console.log(meshArr[0].center);
+      // console.log(meshArr[0].center);
       let first = meshArr[0].center;
       let flyLineArr = [];
       meshArr.forEach((item, index) => {
