@@ -14,6 +14,7 @@ export default new Vuex.Store({
     token: null,
     isLogin: false,
     positionCity: null,
+    userPosition: null,
   },
   mutations: {
     changeisLogin(state) {
@@ -46,6 +47,9 @@ export default new Vuex.Store({
     },
     setPositionCity(state, positionCity) {
       state.positionCity = positionCity;
+    },
+    setuserPosition(state, userPosition) {
+      state.userPosition = userPosition;
     },
   },
   actions: {
@@ -80,6 +84,9 @@ export default new Vuex.Store({
     },
     setPositionCity(context, positionCity) {
       context.commit("setPositionCity", positionCity);
+    },
+    setuserPosition(context, userPosition) {
+      context.commit("setuserPosition", userPosition);
     },
   },
   plugins: [

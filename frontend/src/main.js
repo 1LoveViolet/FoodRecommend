@@ -9,6 +9,8 @@ import dayjs from "dayjs";
 import VueAMap from "vue-amap";
 import "../node_modules/dat.gui/build/dat.gui.js";
 import "../node_modules/dat.gui/build/dat.gui.css";
+import * as echarts from "echarts";
+Vue.prototype.$echarts = echarts;
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(VueRouter);

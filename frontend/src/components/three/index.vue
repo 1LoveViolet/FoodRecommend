@@ -45,6 +45,8 @@
         >显示热门商家</el-button
       >
     </div>
+    <div id="barcharts"></div>
+    <div id="piecharts"></div>
   </div>
 </template>
 
@@ -141,14 +143,23 @@ export default {
       hotGoods: [],
       showGoods: [],
       isHotGoods: true,
+      nameArr: [],
+      ratingArr: [],
+      priceArr: [],
+      pieData: [],
       hotcubeArr: [],
       hotLineArr: [],
       spriteGroup: [],
+
+      userPosition: [],
+      userCube: null,
+      userLine: null,
+      userSprite: null,
     };
   },
   created() {
-    this.getAllRestaurantInfo();
     this.searchUserByIdmethod();
+    this.getAllRestaurantInfo();
     this.getGeoJson(100000);
   },
   mounted() {
@@ -161,14 +172,302 @@ export default {
     // this.scene.add(...this.hotLineArr);
   },
   methods: {
+    drawpieChart() {
+      var chartDom = document.getElementById("piecharts");
+      var myChart = this.$echarts.init(chartDom);
+      var option;
+
+      option = {
+        tooltip: {
+          trigger: "item",
+        },
+        legend: {
+          orient: "vertical",
+          left: "left",
+        },
+        series: [
+          {
+            type: "pie",
+            radius: "50%",
+            data: this.pieData,
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
+        grid: {
+          y2: 100,
+        },
+      };
+
+      myChart.setOption(option);
+    },
+    drawbarChart() {
+      // console.log(
+      //   "drawbarChart()中的nameArr,ratingArr,priceArr",
+      //   this.nameArr,
+      //   this.ratingArr,
+      //   this.priceArr
+      // );
+      // 基于准备好的dom，初始化echarts实例
+      let myChart = this.$echarts.init(document.getElementById("barcharts"));
+      var app = {};
+      var option;
+      const posList = [
+        "left",
+        "right",
+        "top",
+        "bottom",
+        "inside",
+        "insideTop",
+        "insideLeft",
+        "insideRight",
+        "insideBottom",
+        "insideTopLeft",
+        "insideTopRight",
+        "insideBottomLeft",
+        "insideBottomRight",
+      ];
+      app.configParameters = {
+        rotate: {
+          min: -90,
+          max: 90,
+        },
+        align: {
+          options: {
+            left: "left",
+            center: "center",
+            right: "right",
+          },
+        },
+        verticalAlign: {
+          options: {
+            top: "top",
+            middle: "middle",
+            bottom: "bottom",
+          },
+        },
+        position: {
+          options: posList.reduce(function (map, pos) {
+            map[pos] = pos;
+            return map;
+          }, {}),
+        },
+        distance: {
+          min: 0,
+          max: 100,
+        },
+      };
+      app.config = {
+        rotate: 90,
+        align: "left",
+        verticalAlign: "middle",
+        position: "insideBottom",
+        distance: 15,
+        onChange: function () {
+          const labelOption = {
+            rotate: app.config.rotate,
+            align: app.config.align,
+            verticalAlign: app.config.verticalAlign,
+            position: app.config.position,
+            distance: app.config.distance,
+          };
+          myChart.setOption({
+            series: [
+              {
+                label: labelOption,
+              },
+              {
+                label: labelOption,
+              },
+              {
+                label: labelOption,
+              },
+              {
+                label: labelOption,
+              },
+            ],
+          });
+        },
+      };
+      const labelOption = {
+        show: true,
+        position: app.config.position,
+        distance: app.config.distance,
+        align: app.config.align,
+        verticalAlign: app.config.verticalAlign,
+        rotate: app.config.rotate,
+        // formatter: "{c}  {name|{a}}",
+        formatter: "{c}",
+        fontSize: 16,
+        rich: {
+          name: {},
+        },
+      };
+      // 指定图表的配置项和数据
+      option = {
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow",
+          },
+        },
+        legend: {
+          data: ["评分", "人均价格"],
+        },
+        toolbox: {
+          show: true,
+          orient: "vertical",
+          left: "right",
+          top: "center",
+          feature: {
+            mark: { show: true },
+            dataView: { show: true, readOnly: false },
+            magicType: { show: true, type: ["line", "bar", "stack"] },
+            restore: { show: true },
+            saveAsImage: { show: true },
+          },
+        },
+        grid: {
+          y2: 200,
+        },
+        xAxis: [
+          {
+            type: "category",
+            axisTick: { show: false },
+            data: this.nameArr,
+
+            axisLabel: {
+              interval: 0,
+              formatter: function (value) {
+                return value.split("").join("\n");
+              },
+            },
+          },
+        ],
+        yAxis: [
+          {
+            type: "value",
+          },
+        ],
+        series: [
+          {
+            name: "评分",
+            type: "bar",
+            barGap: 0,
+            label: labelOption,
+            emphasis: {
+              focus: "series",
+            },
+            data: this.ratingArr,
+          },
+          {
+            name: "人均价格",
+            type: "bar",
+            label: labelOption,
+            emphasis: {
+              focus: "series",
+            },
+            data: this.priceArr,
+          },
+        ],
+      };
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+    },
+    //展示用户所在位置
+    showUserPostion() {
+      // 使用纹理加载器加载图片
+      console.log(
+        "头像路径和用户位置",
+        this.$store.state.user[0].avatar_url,
+        this.userPosition
+      );
+      const texture = new THREE.TextureLoader().load(
+        this.$store.state.user[0].avatar_url
+      );
+      // 精灵材质
+      const spriteMaterial = new THREE.SpriteMaterial({
+        map: texture,
+      });
+      // 精灵
+      const sprite = new THREE.Sprite(spriteMaterial);
+      sprite.position.set(this.userPosition[0], -this.userPosition[1], 3);
+      sprite.scale.set(0.5, 0.5, 0.5);
+      this.scene.add(sprite);
+
+      let geometry = new THREE.SphereGeometry(0.1, 32, 16);
+      let material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      let sphere = new THREE.Mesh(geometry, material);
+      sphere.position.set(this.userPosition[0], -this.userPosition[1], 0.2);
+      sphere.scale.set(0.2, 0.2, 0.2);
+      this.scene.add(sphere);
+
+      const curve = new THREE.QuadraticBezierCurve3(
+        new THREE.Vector3(this.userPosition[0], -this.userPosition[1], 0.2),
+        new THREE.Vector3(this.userPosition[0], -this.userPosition[1], 1),
+        new THREE.Vector3(this.userPosition[0], -this.userPosition[1], 3)
+      );
+      // console.log(curve);
+      const points = curve.getPoints(50);
+      //   this.moveLine(curve);
+      const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+      // line.geometry = lineGeometry;
+      // 获取曲线 上的50个点
+      var positions = [];
+      var colors = [];
+
+      // 给每个顶点设置演示 实现渐变
+      for (var j = 0; j < points.length; j++) {
+        var color = new THREE.Color(); // 创建新的 Color 对象
+        var hue = j / points.length; // 色相从蓝色到白色渐变
+        var saturation = 1; // 饱和度保持不变
+        var lightness = 0.5 + (j * 0.5) / points.length; // 亮度从0.5到1渐变
+
+        color.setHSL(hue, saturation, lightness); // 设置颜色
+        colors.push(color.r, color.g, color.b); // 将颜色值添加到数组中
+        positions.push(points[j].x, points[j].y, points[j].z);
+      }
+      // 放入顶点 和 设置顶点颜色
+      // console.log(positions);
+      // console.log(colors);
+      lineGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(new Float32Array(positions), 3)
+      );
+      lineGeometry.setAttribute(
+        "color",
+        new THREE.BufferAttribute(new Float32Array(colors), 3)
+      );
+
+      const materialhotline = new THREE.LineBasicMaterial({
+        // vertexColors: THREE.VertexColors,
+        vertexColors: true,
+        linewidth: 1,
+        side: THREE.DoubleSide,
+        // color: "#FF7744",
+        // color: 0x2e91c2,
+      });
+      const hotline = new THREE.Line(lineGeometry, materialhotline);
+      this.scene.add(hotline);
+    },
     restaurantSprite() {
+      this.showUserPostion();
       this.hotcubeArr = [];
       this.hotLineArr = [];
+      this.spriteGroup = [];
+      // console.log("restaurantSprite执行后");
+      // console.log("this.spriteGroup", this.spriteGroup);
+      // console.log("this.hotcubeArr", this.hotcubeArr);
+      // console.log("this.hotLineArr", this.hotLineArr);
       // if (this.meshLevel == "district") {
+      console.log("this.hotGoods", this.hotGoods);
       this.hotGoods.map((item, index) => {
-        console.log("item", item);
-        item.position = this.merTrans(item.position);
-        console.log("item.position", item.position);
+        console.log(item.position);
         // 使用纹理加载器加载图片
         const texture = new THREE.TextureLoader().load(item.image_url);
         // 精灵材质
@@ -180,13 +479,14 @@ export default {
         // 添加到组
         this.spriteGroup.push(sprite);
         var position = this.generateSpritePosition(); // 获取生成的位置向量
+        console.log("生成的位置向量", position);
         // console.log("sprite获取生成的位置向量", position);
         sprite.position.copy(position);
         sprite.scale.set(0.5, 0.5, 0.5);
         // console.log("this.spriteGroup", this.spriteGroup);
         // this.scene.add(...this.spriteGroup);
         let geometry = new THREE.SphereGeometry(0.1, 32, 16);
-        let material = new THREE.MeshBasicMaterial({ color: 0x1111ff });
+        let material = new THREE.MeshBasicMaterial({ color: 0xdc143c });
         let sphere = new THREE.Mesh(geometry, material);
         sphere.position.set(item.position[0], -item.position[1], 0.2);
         sphere.scale.set(0.2, 0.2, 0.2);
@@ -241,9 +541,6 @@ export default {
         const hotline = new THREE.Line(lineGeometry, materialhotline);
         this.hotLineArr.push(hotline);
         // this.scene.add(...this.hotLineArr);
-        this.scene.add(...this.spriteGroup);
-        this.scene.add(...this.hotcubeArr);
-        this.scene.add(...this.hotLineArr);
       });
       // }
     },
@@ -255,8 +552,8 @@ export default {
       let minY = bounds.minY;
       let minZ = 1.8; // Z 坐标最小值
       let maxZ = 2.3; // Z 坐标最大值
-      console.log("X 范围:", bounds.minX, "-", bounds.maxX);
-      console.log("Y 范围:", bounds.minY, "-", bounds.maxY);
+      // console.log("X 范围:", bounds.minX, "-", bounds.maxX);
+      // console.log("Y 范围:", bounds.minY, "-", bounds.maxY);
       let simplexNoise = new SimplexNoise();
       let a = this.map(
         simplexNoise.noise3d(Math.random(), Math.random(), Math.random()),
@@ -280,7 +577,7 @@ export default {
         maxZ
       );
       let position = new THREE.Vector3(a, b, c);
-      console.log("generateSpritePosition返回的坐标", position);
+      // console.log("generateSpritePosition返回的坐标", position);
       return position;
     },
     // 映射函数
@@ -372,7 +669,10 @@ export default {
         this.scene.remove(...this.spriteGroup);
         this.scene.remove(...this.hotcubeArr);
         this.scene.remove(...this.hotLineArr);
-        this.isHotGoods = false;
+        this.hotcubeArr = [];
+        this.hotLineArr = [];
+        this.spriteGroup = [];
+        this.isHotGoods = true;
       }
     },
     tonextLevel() {
@@ -397,6 +697,9 @@ export default {
             this.scene.remove(...this.circleYs);
             this.scene.remove(...this.flyLineArr);
             this.scene.remove(...this.moveSpots);
+            this.scene.remove(...this.spriteGroup);
+            this.scene.remove(...this.hotcubeArr);
+            this.scene.remove(...this.hotLineArr);
             // this.scene.remove(...this.line2Arr);
           }
           this.geoJson = response.data;
@@ -479,7 +782,10 @@ export default {
           console.log("this.circleYs", this.circleYs);
           // scene.add(...meshArr);
           if (adcode == 510100) {
-            this.once(this.restaurantSprite());
+            this.restaurantSprite();
+            this.scene.add(...this.spriteGroup);
+            this.scene.add(...this.hotcubeArr);
+            this.scene.add(...this.hotLineArr);
           }
           this.scene.add(...this.line2Arr);
           this.scene.add(...this.meshArr);
@@ -890,6 +1196,7 @@ export default {
         .center([this.centerPos.x, this.centerPos.y])
         .translate([0, 0]);
       // console.log(merTrans);
+      this.userPosition = this.merTrans(this.$store.state.userPosition);
     },
     //绘制二维地图用于拉伸成3d
     drawPlan(lonlatArr) {
@@ -1088,6 +1395,11 @@ export default {
     getAllRestaurantInfo() {
       searchAllRestaurants().then((res) => {
         this.showGoods = res.data;
+        console.log(res);
+        console.log(
+          "执行this.comprehensiveSort之前的this.showGoods",
+          this.showGoods
+        );
         this.comprehensiveSort(
           this.showGoods,
           this.favorites,
@@ -1097,7 +1409,10 @@ export default {
         );
         this.getHotGoods();
         this.showHotGoods();
-        console.log("this.showGoods", this.showGoods);
+        console.log(
+          "执行this.comprehensiveSort后的this.showGoods",
+          this.showGoods
+        );
         console.log("this.hotGoods", this.hotGoods);
       });
     },
@@ -1108,7 +1423,14 @@ export default {
       ratingThreshold,
       priceRangeThreshold
     ) {
-      console.log("shops: ", shops);
+      console.log("comprehensiveSort中的shops: ", shops);
+      console.log("comprehensiveSort中的favorites: ", favorites);
+      console.log("comprehensiveSort中的userFavorites: ", userFavorites);
+      console.log("comprehensiveSort中的ratingThreshold: ", ratingThreshold);
+      console.log(
+        "comprehensiveSort中的priceRangeThreshold: ",
+        priceRangeThreshold
+      );
       // 计算每个商家的初始权重值
       shops.forEach((shop) => {
         shop.weight = shop.rating * 0.2; // 初始权重为 (5 - rating) * 0.1
@@ -1197,7 +1519,7 @@ export default {
       if (this.$store.state.user[0].user_id) {
         console.log("执行了searchUserByIdmethod函数");
         searchUserById(this.$store.state.user[0].user_id).then((res) => {
-          this.favorites = [];
+          // this.favorites = [];
           console.log(res);
           let Arr = res.data;
           Arr.forEach((item) => {
@@ -1238,10 +1560,21 @@ export default {
       this.showHotGoods();
     },
     showHotGoods() {
+      this.nameArr = [];
+      this.ratingArr = [];
+      this.priceArr = [];
+      this.pieData = [];
       this.hotGoods.map((item, index) => {
+        this.nameArr.push(item.name);
+        this.ratingArr.push(item.rating);
+        this.priceArr.push(item.price_range);
+        this.pieData.push({ value: item.rating, name: item.name });
         this.onSearchAddress(item);
+        // item.position = this.merTrans(item.position);
       });
-      console.log("添加经纬度后的this.hotGoods", this.hotGoods);
+      // console.log("添加经纬度后的this.hotGoods", this.hotGoods);
+      this.drawbarChart();
+      this.drawpieChart();
       // console.log("item", item);
       // console.log("item.position", item.position);
       // // console.log("item.position", item.position[0]);
@@ -1250,18 +1583,23 @@ export default {
       // console.log([x, y]);
     },
     onSearchAddress(item) {
-      console.log(" onSearchAddress方法的e:", item);
+      // console.log(" onSearchAddress方法的e:", item);
       AMap.plugin("AMap.Geocoder", () => {
         var geocoder = new AMap.Geocoder({
           // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
           city: this.$store.state.position,
         });
         geocoder.getLocation(item.address, (status, result) => {
+          console.log("status,result", status, result);
           if (status === "complete" && result.info === "OK") {
-            item.position = [
+            // console.log([
+            //   result.geocodes[0].location.lng,
+            //   result.geocodes[0].location.lat,
+            // ]);
+            item.position = this.merTrans([
               result.geocodes[0].location.lng,
               result.geocodes[0].location.lat,
-            ];
+            ]);
           }
         });
       });

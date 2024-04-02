@@ -46,7 +46,7 @@
             地址：{{ restaurantInfo[0].address }}
             <i
               class="el-icon-location"
-              @click="onSearchAddress(scope.row.address)"
+              @click="onSearchAddress(restaurantInfo[0].address)"
             >
             </i>
           </div>

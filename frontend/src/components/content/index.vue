@@ -157,6 +157,7 @@ export default {
       userFavorites: [],
       hotGoods: [],
       positionCity: null,
+      userPosition: null,
     };
   },
   created() {
@@ -206,7 +207,13 @@ export default {
         console.log("得到处理后的数据", positionInfo);
         // 在这里处理positionInfo的数据
         this.positionCity = positionInfo.addressComponent.city;
+        this.userPosition = [
+          positionInfo.position.lng,
+          positionInfo.position.lat,
+        ];
+        console.log("得到处理后的数据dethis.userPosition", this.userPosition);
         this.$store.dispatch("setPositionCity", this.positionCity);
+        this.$store.dispatch("setuserPosition", this.userPosition);
         console.log(this.positionCity);
       })
       .catch((error) => {
@@ -241,6 +248,7 @@ export default {
           this.hotGoods.push(item);
         }
       });
+      console.log("this.hotGoods", this.hotGoods);
     },
     searchUserByIdmethod() {
       if (this.$store.state.user[0].user_id) {
@@ -409,7 +417,14 @@ export default {
       ratingThreshold,
       priceRangeThreshold
     ) {
-      console.log("shops: ", shops);
+      console.log("comprehensiveSort中的shops: ", shops);
+      console.log("comprehensiveSort中的favorites: ", favorites);
+      console.log("comprehensiveSort中的userFavorites: ", userFavorites);
+      console.log("comprehensiveSort中的ratingThreshold: ", ratingThreshold);
+      console.log(
+        "comprehensiveSort中的priceRangeThreshold: ",
+        priceRangeThreshold
+      );
       // 计算每个商家的初始权重值
       shops.forEach((shop) => {
         shop.weight = shop.rating * 0.2; // 初始权重为 (5 - rating) * 0.1
@@ -583,12 +598,21 @@ export default {
     getAllRestaurantInfo() {
       searchAllRestaurants().then((res) => {
         this.showGoods = res.data;
+        console.log(res);
+        console.log(
+          "执行this.comprehensiveSort之前的this.showGoods",
+          this.showGoods
+        );
         this.comprehensiveSort(
           this.showGoods,
           this.favorites,
           this.userFavorites,
           this.ratingThreshold,
           this.priceRangeThreshold
+        );
+        console.log(
+          "执行this.comprehensiveSort后的this.showGoods",
+          this.showGoods
         );
         this.getHotGoods();
         if (this.$refs.goodList) {
