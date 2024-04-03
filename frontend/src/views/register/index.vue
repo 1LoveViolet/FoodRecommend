@@ -50,6 +50,7 @@
 </template>
 
 <script >
+import { STMPregister } from "api/user";
 export default {
   data() {
     return {
@@ -92,12 +93,10 @@ export default {
   },
   methods: {
     sendMsg() {
-      const phone = this.FormData.phoneNumber;
-      this.axios
-        .post("user/sendMsg", {
-          phone: phone,
-        })
+      const email = this.FormData.phoneNumber;
+      STMPregister(email)
         .then((response) => {
+          console.log("res", res);
           this.$message({
             message: "验证码已发送，注意查看",
             type: "success",
@@ -113,12 +112,12 @@ export default {
       // 用户注册逻辑
       const username = this.FormData.username;
       const password = this.FormData.password;
-      const phone = this.FormData.phoneNumber;
+      const email = this.FormData.phoneNumber;
       const code = this.FormData.code;
       // 发送登录请求
       this.axios
         .post("user/register", {
-          phone: phone,
+          email: email,
           username: username,
           password: password,
           code: code,

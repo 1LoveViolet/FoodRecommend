@@ -24,6 +24,19 @@ export function login(data) {
     data: data,
   });
 }
+
+//邮箱注册
+export function STMPregister(data) {
+  return axios({
+    url: "/api/email",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+    data: data,
+  });
+}
 //上传用户头像
 export function uploadAvatar(data) {
   return axios({
