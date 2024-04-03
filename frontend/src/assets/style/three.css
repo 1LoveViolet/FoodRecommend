@@ -6,6 +6,14 @@ body {
     transition: all 0.3s;
 }
 
+#three {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
 #tooltip {
     position: absolute;
     left: 0;
@@ -25,7 +33,7 @@ body {
     display: flex;
     justify-content: space-between;
     position: absolute;
-    left: 100px;
+    left: 10px;
     top: 10px;
 }
 

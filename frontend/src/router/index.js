@@ -83,5 +83,18 @@ router.beforeEach((to, from, next) => {
       },
     });
   }
+  // if (from.name) {
+  //   const componentInstance = router.app.$children.find(
+  //     (child) => child.$route.name === from.name
+  //   );
+  //   if (componentInstance) {
+  //     componentInstance.$destroy();
+  //   }
+  // }
+  // next();
+  if (from.name === "rank") {
+    from.meta.destroyComponent();
+    next();
+  }
 });
 export default router;

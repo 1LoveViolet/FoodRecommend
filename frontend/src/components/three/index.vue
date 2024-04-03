@@ -1,7 +1,9 @@
 <template>
   <div>
+    <canvas id="three"></canvas>
     <div id="tooltip"></div>
     <div id="tubiao">
+      <el-button type="success" round @click="toHome">返回</el-button>
       <el-button
         type="primary"
         round
@@ -52,7 +54,6 @@
 
 <script>
 import { gsap } from "gsap";
-import dat from "dat.gui";
 // 现在浏览器支持ES6语法，自然包括import方式引入js文件
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
@@ -70,7 +71,6 @@ import { searchUserById } from "api/user";
 import { SimplexNoise } from "three/examples/jsm/math/SimplexNoise";
 export default {
   data() {
-    const gui = new dat.GUI();
     return {
       renderer: null,
       scene: null,
@@ -155,6 +155,8 @@ export default {
       userCube: null,
       userLine: null,
       userSprite: null,
+
+      noclick: false,
     };
   },
   created() {
@@ -163,15 +165,81 @@ export default {
     this.getGeoJson(100000);
   },
   mounted() {
-    this.stats = new Stats();
-    document.body.appendChild(this.stats.dom);
+    // this.stats = new Stats();
+    // document.body.appendChild(this.stats.dom);
     window.addEventListener("click", this.click);
     this.start();
-    // this.scene.add(...this.spriteGroup);
-    // this.scene.add(...this.hotcubeArr);
-    // this.scene.add(...this.hotLineArr);
+  },
+  destroyed() {
+    // this.$router.go(0);
+    // 在组件销毁时确保销毁Three.js场景
+    this.clearScene();
+    this.destroyThreejs();
+    this.removeEventListeners();
+    console.log("执行destroyed钩子函数");
+    // this.removeEventListeners();
+    // this.destroyThreejs();
+    // this.destroyThreeScene();
+    // console.log("destroyThreeScene执行后的this.scene", this.scene);
   },
   methods: {
+    clearScene() {
+      cancelAnimationFrame(this.render);
+      this.scene.traverse((child) => {
+        if (child.material) {
+          child.material.dispose();
+        }
+        if (child.geometry) {
+          child.geometry.dispose();
+        }
+        child = null;
+      });
+      // this.sceneDomElement.innerHTML = "";
+      this.renderer.dispose();
+      this.renderer.forceContextLoss();
+      this.renderer.clear();
+      this.scene.clear();
+      console.log("clearScene");
+    },
+    destroyThreejs() {
+      try {
+        this.renderer.dispose();
+        this.renderer.forceContextLoss();
+        this.renderer.content = null;
+        let gl = this.renderer.domElement.getContext("webgl");
+        if (gl && gl.getExtension("WEBGL_lose_context")) {
+          gl.getExtension("WEBGL_lose_context").loseContext();
+        }
+        this.renderer = null;
+        this.camera = null;
+        this.scene.traverse((child) => {
+          if (child.material) {
+            child.material.dispose();
+          }
+          if (child.geometry) {
+            child.geometry.dispose();
+          }
+          child = null;
+        });
+        this.scene = null;
+      } catch (e) {
+        console.error("Failed to destroy threejs", e);
+      }
+    },
+    removeEventListeners() {
+      window.removeEventListener("click", this.click, false);
+      window.removeEventListener(
+        "mousemove",
+        (_event) => {
+          // console.log("mousemove", _event);
+          this.mouse.x = (_event.clientX / sizes.width) * 2 - 1;
+          this.mouse.y = -(_event.clientY / sizes.height) * 2 + 1;
+          this.mouseX = _event.clientX;
+          this.mouseY = _event.clientY;
+        },
+        false
+      );
+    },
     drawpieChart() {
       var chartDom = document.getElementById("piecharts");
       var myChart = this.$echarts.init(chartDom);
@@ -832,12 +900,17 @@ export default {
     // 初始化渲染器
     initRenderer() {
       // antialias是否开启抗锯齿
-      this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      const canvas = document.querySelector("#three");
+      this.renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+      });
       this.renderer.setClearAlpha(0.2);
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       // renderer.setClearColor(0xeeeeee);
       this.renderer.physicallyCorrectLights = true;
-      document.body.appendChild(this.renderer.domElement);
+      // document.body.appendChild(this.renderer.domElement);
     },
     // 初始化相机
     initCamera() {
@@ -871,96 +944,106 @@ export default {
       this.scene.add(directionalLight);
     },
     render() {
-      this.onRay();
-      this.renderCircle();
-      // this.renderLine(); //移动小球
-      // arclineAnimate();
-      this.renderer.render(this.scene, this.camera);
-      this.controls.update();
-      this.stats.update(); //更新性能插件
-      requestAnimationFrame(this.render);
+      if (!this.noclick) {
+        this.onRay();
+        this.renderCircle();
+        // this.renderLine(); //移动小球
+        // arclineAnimate();
+        this.renderer.render(this.scene, this.camera);
+        this.controls.update();
+        // this.stats.update(); //更新性能插件
+        requestAnimationFrame(this.render);
+      }
     },
     onRay() {
-      this.raycaster.setFromCamera(this.mouse, this.camera);
-      // const mapChildren = scene.children.filter((item) => {
-      //   // console.log(item.geometry);
-      //   item.type == "Mesh";
-      // });
-      // console.log(meshArr);
-      const mapChildren = this.scene.children.filter((item) => {
-        // console.log(item);
-        // item.type == "Mesh";
-      });
-      // 被射线照射到的一组对象
-      const intersects = this.raycaster.intersectObjects(this.meshArr);
-      // console.log(intersects);
-      const tooltip = document.getElementById("tooltip");
-      // 如果有相交的物体
-      if (intersects.length > 0) {
-        tooltip.style.display = "block";
-        tooltip.style.left = this.mouseX + "px";
-        tooltip.style.top = this.mouseY + "px";
-        tooltip.innerText = intersects[0].object.name;
-        if (this.INTERSECTED != intersects[0].object) {
-          // 这里选中的物体是上一个选中物体。
+      if (!this.noclick) {
+        this.noclick = false;
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        // const mapChildren = scene.children.filter((item) => {
+        //   // console.log(item.geometry);
+        //   item.type == "Mesh";
+        // });
+        // console.log(meshArr);
+        const mapChildren = this.scene.children.filter((item) => {
+          // console.log(item);
+          // item.type == "Mesh";
+        });
+        // 被射线照射到的一组对象
+        var intersects = this.raycaster.intersectObjects(this.meshArr);
+        // console.log(intersects);
+        var tooltip = document.getElementById("tooltip");
+        // 如果有相交的物体
+        if (intersects.length > 0) {
+          tooltip.style.display = "block";
+          tooltip.style.left = this.mouseX + "px";
+          tooltip.style.top = this.mouseY + "px";
+          tooltip.innerText = intersects[0].object.name;
+          if (this.INTERSECTED != intersects[0].object) {
+            // 这里选中的物体是上一个选中物体。
+            if (this.INTERSECTED) {
+              // 把上一个选中的物体设置为当前色。
+              this.INTERSECTED.material.color.setHex(
+                this.INTERSECTED.currentHex
+              );
+              // INTERSECTED.position.z = 0;
+            }
+            // 设置当前选中的物体
+            this.INTERSECTED = intersects[0].object;
+            // 保留当前选中物体，**原本的颜色**
+            this.INTERSECTED.currentHex =
+              this.INTERSECTED.material.color.getHex();
+            // console.log(INTERSECTED.currentHex);
+            // 设置当前选中的物体颜色为红色
+            this.INTERSECTED.material.color.setHex(0xff0000);
+            // INTERSECTED.position.z = 3;
+          }
+          // 如果没有相交的物体，把选中的物体设置为原来的颜色
+        } else {
           if (this.INTERSECTED) {
-            // 把上一个选中的物体设置为当前色。
             this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
             // INTERSECTED.position.z = 0;
           }
-          // 设置当前选中的物体
-          this.INTERSECTED = intersects[0].object;
-          // 保留当前选中物体，**原本的颜色**
-          this.INTERSECTED.currentHex =
-            this.INTERSECTED.material.color.getHex();
-          // console.log(INTERSECTED.currentHex);
-          // 设置当前选中的物体颜色为红色
-          this.INTERSECTED.material.color.setHex(0xff0000);
-          // INTERSECTED.position.z = 3;
-        }
-        // 如果没有相交的物体，把选中的物体设置为原来的颜色
-      } else {
-        if (this.INTERSECTED) {
-          this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
-          // INTERSECTED.position.z = 0;
-        }
-        // 清空选中物体
-        tooltip.style.display = "none";
+          // 清空选中物体
+          tooltip.style.display = "none";
 
-        this.INTERSECTED = null;
+          this.INTERSECTED = null;
+        }
       }
     },
     click() {
-      this.raycaster.setFromCamera(this.mouse, this.camera);
-      const mapChildren = this.scene.children.filter(
-        (item) => item.type === "Mesh"
-      );
-      // 被射线照射到的一组对象
-      const intersects = this.raycaster.intersectObjects(mapChildren);
-      console.log("被射线照射到的一组对象", intersects[0]);
-      const tooltip = document.getElementById("tooltip");
-      if (intersects.length > 0) {
-        console.log(intersects[0]);
-        this.upz = this.upz * 2;
-        this.getprovinceJson(intersects[0].object);
-        this.cameraLookAt(
-          intersects[0].object.center[0],
-          intersects[0].object.center[1]
+      if (!this.noclick) {
+        this.noclick = false;
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        const mapChildren = this.scene.children.filter(
+          (item) => item.type === "Mesh"
         );
-      } else {
-        console.log("没有选中");
-        // getGeoJson(100000);
+        // 被射线照射到的一组对象
+        const intersects = this.raycaster.intersectObjects(mapChildren);
+        console.log("被射线照射到的一组对象", intersects[0]);
+        const tooltip = document.getElementById("tooltip");
+        if (intersects.length > 0) {
+          console.log(intersects[0]);
+          this.upz = this.upz * 2;
+          this.getprovinceJson(intersects[0].object);
+          this.cameraLookAt(
+            intersects[0].object.center[0],
+            intersects[0].object.center[1]
+          );
+        } else {
+          console.log("没有选中");
+          // getGeoJson(100000);
+        }
       }
     },
     renderCircle() {
       this.circleYs.forEach(function (mesh) {
         // 目标 圆环放大 并 透明
         mesh._s += 0.01;
-        mesh.scale.set(2 * mesh._s, 2 * mesh._s, 2 * mesh._s);
+        mesh.scale.set(1 * mesh._s, 1 * mesh._s, 1 * mesh._s);
         if (mesh._s <= 2) {
           mesh.material.opacity = 2 - mesh._s;
         } else {
-          mesh._s = 1;
+          mesh._s = 0.2;
         }
       });
     },
@@ -1350,6 +1433,7 @@ export default {
       };
       this.mouse = new THREE.Vector2();
       window.addEventListener("mousemove", (_event) => {
+        // console.log("mousemove", _event);
         this.mouse.x = (_event.clientX / sizes.width) * 2 - 1;
         this.mouse.y = -(_event.clientY / sizes.height) * 2 + 1;
         this.mouseX = _event.clientX;
@@ -1364,29 +1448,12 @@ export default {
       this.camera.position.set(x, -y - 30, 40);
       this.camera.lookAt(this.v);
     },
-    addGui() {
-      gui
-        .add(this.extrudeSettings, "steps")
-        .min(2)
-        .max(10)
-        .step(1)
-        .name("steps")
-        .onFinishChange(this.getGeoJson);
-      gui
-        .add(this.extrudeSettings, "depth")
-        .min(2)
-        .max(16)
-        .step(1)
-        .name("depth")
-        .onFinishChange(this.getGeoJson);
-    },
     start() {
       this.initRenderer();
       this.initScene();
       this.initCamera();
       this.initControls();
       this.initLight();
-      // addGui();
       this.getSelMap();
       //   this.createPlane();
       // mousemove();
@@ -1603,6 +1670,11 @@ export default {
           }
         });
       });
+    },
+    toHome() {
+      this.noclick = true;
+      this.removeEventListeners();
+      this.$router.push("/home");
     },
   },
 };

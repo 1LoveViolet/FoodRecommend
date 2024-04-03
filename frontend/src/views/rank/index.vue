@@ -3,7 +3,7 @@
     <!-- <myheader></myheader> -->
     <!-- <div class="content">排行</div> -->
     <!-- <myecharts></myecharts> -->
-    <mythree></mythree>
+    <mythree :key="componentKey"></mythree>
     <!-- <myfooter></myfooter> -->
   </div>
 </template>
@@ -16,10 +16,25 @@ const mythree = () => import("components/three/index.vue");
 export default {
   components: { myheader, myfooter, myecharts, mythree },
   data() {
-    return {};
+    return {
+      componentKey: 0,
+    };
   },
-  created() {},
-  methods: {},
+  beforeRouteLeave(to, from, next) {
+    this.forceRerender();
+    next();
+  },
+  destroyed() {
+    this.forceRerender();
+  },
+  created() {
+    this.forceRerender();
+  },
+  methods: {
+    forceRerender() {
+      this.componentKey += 1;
+    },
+  },
 };
 </script>
   
