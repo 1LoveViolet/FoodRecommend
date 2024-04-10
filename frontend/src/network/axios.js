@@ -2,11 +2,13 @@ import originAxios from "axios";
 import qs from "qs";
 import store from "../store/index";
 export default function axios(option) {
+  // originAxios.defaults.withCredentials = true;
   return new Promise((resolve, reject) => {
     // 1.创建axios的实例
     const instance = originAxios.create({
-      baseURL: "http://127.0.0.1:3000", //我电脑问题，你们使用改成http://127.0.0.1
+      baseURL: "http://localhost:3000", //我电脑问题，你们使用改成http://127.0.0.1
       timeout: 5000,
+      withCredentials: true,
     });
 
     // 配置请求和响应拦截
@@ -20,6 +22,7 @@ export default function axios(option) {
         // 3.对请求的参数进行序列化(看服务器是否需要序列化)
         // config.data = qs.stringify(config.data)
         // console.log(config);
+        // config.withCredentials = true;
         config.headers = {
           ...config.headers,
           Authorization: store.state.token,

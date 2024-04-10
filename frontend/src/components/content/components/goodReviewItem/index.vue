@@ -1,10 +1,16 @@
 <template>
   <div class="review">
     <div class="rv-user">
-      <img :src="ReviewsItem.user_avatar" alt="" />
+      <img
+        :src="ReviewsItem.user_avatar"
+        @click="userDetail(ReviewsItem.user_id)"
+        alt=""
+      />
     </div>
     <div class="rv-content">
-      <div class="rv-content-username">{{ ReviewsItem.user_name }}</div>
+      <div class="rv-content-username" @click="userDetail(ReviewsItem.user_id)">
+        {{ ReviewsItem.user_name }}
+      </div>
       <el-rate
         v-model="ReviewsItem.rating"
         disabled
@@ -55,6 +61,16 @@ export default {
         " &nbsp"
       );
     },
+    userDetail(id) {
+      const newhref = this.$router.resolve({
+        path: "/user",
+        name: "user",
+        query: { id: id },
+        // params: this.goodsItem.restaurant_id,
+      });
+
+      window.open(newhref.href, "_blank");
+    },
   },
 };
 </script>
@@ -73,6 +89,7 @@ export default {
 .rv-user img {
   width: 50px;
   margin-top: 15px;
+  cursor: pointer;
 }
 .rv-content {
   width: 90%;
@@ -93,5 +110,6 @@ export default {
   margin-top: 5px;
   color: #282828;
   font-size: 14px;
+  cursor: pointer;
 }
 </style>

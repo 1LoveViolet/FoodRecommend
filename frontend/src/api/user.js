@@ -25,14 +25,27 @@ export function login(data) {
   });
 }
 
-//邮箱注册
-export function STMPregister(data) {
+//注册
+export function register(data) {
+  return axios({
+    url: "/api/reg",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+    data: data,
+  });
+}
+
+//邮箱发送验证码
+export function STMP(data) {
   return axios({
     url: "/api/email",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": "http://localhost:8080",
     },
     data: data,
   });
@@ -137,6 +150,65 @@ export function isFavorite(user_id, restaurant_id) {
 export function deleteFavorite(user_id, restaurant_id) {
   return axios({
     url: `/api/deleteFavorite/${user_id}-${restaurant_id}`,
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+
+//查询是否关注
+export function isguanzhu(user_id, fan_user_id) {
+  return axios({
+    url: `/api/isguanzhu/${user_id}-${fan_user_id}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+//查询关注用户数量
+export function guanzhuNum(fan_user_id) {
+  return axios({
+    url: `/api/guanzhuNum/${fan_user_id}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+//查询粉丝数量
+export function fansNum(user_id) {
+  return axios({
+    url: `/api/fansNum/${user_id}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+
+//关注其他用户
+export function guanzhu(data) {
+  return axios({
+    url: "/api/guanzhu",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+    data: data,
+  });
+}
+
+//取消关注
+export function deleteGuanzhu(user_id, fan_user_id) {
+  return axios({
+    url: `/api/deleteGuanzhu/${user_id}-${fan_user_id}`,
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

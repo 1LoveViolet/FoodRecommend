@@ -16,6 +16,7 @@ Vue.use(ElementUI);
 Vue.use(VueRouter);
 Vue.use(VueAMap);
 Vue.prototype.axios = axios;
+// axios.defaults.withCredentials = true; //让ajax携带cookie
 VueAMap.initAMapApiLoader({
   key: "66be375bbee739346813eda698d5e2c8", //申请的key码需要填写的地方，格式为长串字符数字
   plugin: [

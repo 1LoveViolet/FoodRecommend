@@ -3,13 +3,9 @@
     <div class="login-main">
       <h3 class="login-title">注册</h3>
       <el-form :rules="rule" ref="FormData" :model="FormData">
-        <el-form-item prop="phoneNumber">
-          <el-input
-            v-model="FormData.phoneNumber"
-            type="text"
-            placeholder="手机号"
-          >
-            <template slot="prepend">+86</template>
+        <el-form-item prop="email">
+          <el-input v-model="FormData.email" type="text" placeholder="邮箱">
+            <!-- <template slot="prepend">+86</template> -->
           </el-input>
         </el-form-item>
         <el-form-item prop="code">
@@ -50,23 +46,23 @@
 </template>
 
 <script >
-import { STMPregister } from "api/user";
+import { register, STMP } from "api/user";
 export default {
   data() {
     return {
       FormData: {
-        phoneNumber: "",
+        email: "",
         code: "",
         username: "",
         password: "",
       },
       rule: {
-        phoneNumber: [
-          { required: true, message: "手机号不能为空", trigger: "blur" },
+        email: [
+          { required: true, message: "邮箱不能为空", trigger: "blur" },
           {
-            pattern: /^1[0-9]{10}$/,
-            message: "手机号格式不正确",
-            trigger: "blur",
+            type: "email",
+            message: "请输入有效的邮箱地址",
+            trigger: ["blur", "change"],
           },
         ],
         code: [{ required: true, message: "验证码不能为空", trigger: "blur" }],
@@ -93,43 +89,92 @@ export default {
   },
   methods: {
     sendMsg() {
-      const email = this.FormData.phoneNumber;
-      STMPregister(email)
-        .then((response) => {
-          console.log("res", res);
+      this.$refs.FormData.validateField("email", (valid) => {
+        console.log("valid", valid);
+        if (!valid) {
+          const email = this.FormData.email;
+          let data = { email: email };
+          STMP(data)
+            .then((res) => {
+              console.log("res", res);
+              this.$message({
+                message: "验证码已发送，注意查看",
+                type: "success",
+              });
+            })
+            .catch((error) => {
+              this.$message({
+                message: error,
+                type: "error",
+              });
+            });
+        } else {
           this.$message({
-            message: "验证码已发送，注意查看",
-            type: "success",
+            message: valid,
           });
-        })
-        .catch((error) => {
-          // 登录失败的处理逻辑
-          // 例如，显示错误信息给用户
-          console.log("失败");
-        });
+        }
+      });
     },
     register() {
-      // 用户注册逻辑
-      const username = this.FormData.username;
-      const password = this.FormData.password;
-      const email = this.FormData.phoneNumber;
-      const code = this.FormData.code;
-      // 发送登录请求
-      this.axios
-        .post("user/register", {
-          email: email,
-          username: username,
-          password: password,
-          code: code,
-        })
-        .then((response) => {
-          this.$router.replace("/login");
-        })
-        .catch((error) => {
-          // 登录失败的处理逻辑
-          // 例如，显示错误信息给用户
-          console.log("失败");
-        });
+      this.$refs.FormData.validate((valid, filed) => {
+        console.log("valid", valid);
+        console.log("filed", filed);
+        if (valid) {
+          // 用户注册逻辑
+          const username = this.FormData.username;
+          const password = this.FormData.password;
+          const email = this.FormData.email;
+          const code = this.FormData.code;
+          let data = {
+            username: username,
+            password: password,
+            email: email,
+            code: code,
+          };
+          register(data)
+            .then((res) => {
+              console.log("res", res);
+              if (res.code == "ERR_BAD_REQUEST") {
+                this.$message({
+                  message: res.response.data,
+                  type: "error",
+                });
+                return;
+              }
+              if (res.code == "ERR_BAD_RESPONSE") {
+                this.$message({
+                  message: res.response.data.msg,
+                  type: "error",
+                });
+                return;
+              }
+              this.$message({
+                message: res.response.data.msg,
+                type: "success",
+              });
+              setTimeout(() => {
+                this.back();
+              }, 1500);
+            })
+            .catch((error) => {
+              // 登录失败的处理逻辑
+              // 例如，显示错误信息给用户
+              console.log(error);
+            });
+        } else {
+          {
+            let error = this.get_object_first_attribute(filed);
+            console.log(error[0].message);
+            this.$message({
+              message: error[0].message,
+              type: "error",
+            });
+          }
+        }
+      });
+    },
+    get_object_first_attribute(data) {
+      for (var key in data) return data[key];
     },
     back() {
       this.$router.replace("/login");
