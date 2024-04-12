@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 //声明中间件
 let checkTokenMiddleware = (req, res, next) => {
   //获取token
-  let token = req.get("token");
+  const token = req.headers.authorization;
   console.log(token);
   //判断
   if (!token) {
@@ -22,6 +22,7 @@ let checkTokenMiddleware = (req, res, next) => {
       });
       return;
     }
+    console.log("token校验成功data", data);
     //如果校验成功
     next();
   });

@@ -9,6 +9,7 @@ const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 const mysql = require("mysql");
 const cors = require("cors");
+const checkTokenMiddleware = require("../middlewares/checkTokenMiddleware");
 
 // router.use(
 //   cors()
@@ -180,7 +181,7 @@ router.post("/login", (req, res) => {
 });
 
 //获取用户头像
-router.get("/getAvatar/:user_id", (req, res) => {
+router.get("/getAvatar/:user_id", checkTokenMiddleware, (req, res) => {
   const user_id = req.params.user_id;
   let sql = `select avatar_url from users  where user_id= "${user_id}"`;
   connection.query(sql, (err, result) => {
@@ -205,7 +206,7 @@ router.get("/getAvatar/:user_id", (req, res) => {
   });
 });
 //上传头像
-router.post("/uploadAvatar", async (req, res) => {
+router.post("/uploadAvatar", checkTokenMiddleware, async (req, res) => {
   try {
     const imageUrl = await uploadAvatar(req, res);
     const user_id = req.body.user_id;
@@ -247,7 +248,7 @@ router.post("/uploadAvatar", async (req, res) => {
 });
 
 //查询用户信息
-router.get("/searchUserById/:user_id", (req, res) => {
+router.get("/searchUserById/:user_id", checkTokenMiddleware, (req, res) => {
   // 使用商家ID查询对应的菜品
   const user_id = req.params.user_id;
   const sql = `
@@ -362,59 +363,67 @@ WHERE
 });
 
 //通过review_id，删除对应评论
-router.delete("/deleteReviewById/:review_id", (req, res) => {
-  // 使用商家ID查询对应的菜品
-  const review_id = req.params.review_id;
-  const sql = `
+router.delete(
+  "/deleteReviewById/:review_id",
+  checkTokenMiddleware,
+  (req, res) => {
+    // 使用商家ID查询对应的菜品
+    const review_id = req.params.review_id;
+    const sql = `
   DELETE FROM reviews
 WHERE review_id = "${review_id}";
   `;
-  connection.query(sql, (err, results) => {
-    if (err) {
-      res.status(500).json({
-        code: "500",
-        msg: "删除对应评论失败",
-        data: null,
-        err: err,
-      });
-    } else {
-      res.json({
-        code: "200",
-        msg: "删除对应评论成功",
-        data: results,
-      });
-    }
-  });
-});
+    connection.query(sql, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          code: "500",
+          msg: "删除对应评论失败",
+          data: null,
+          err: err,
+        });
+      } else {
+        res.json({
+          code: "200",
+          msg: "删除对应评论成功",
+          data: results,
+        });
+      }
+    });
+  }
+);
 
 //通过favorite_id，删除对应收藏
-router.delete("/deleteFavoriteById/:favorite_id", (req, res) => {
-  // 使用商家ID查询对应的菜品
-  const favorite_id = req.params.favorite_id;
-  const sql = `
+router.delete(
+  "/deleteFavoriteById/:favorite_id",
+  checkTokenMiddleware,
+  (req, res) => {
+    // 使用商家ID查询对应的菜品
+    const favorite_id = req.params.favorite_id;
+    const sql = `
   DELETE FROM favorites
 WHERE favorite_id = "${favorite_id}";
   `;
-  connection.query(sql, (err, results) => {
-    if (err) {
-      res.status(500).json({
-        code: "500",
-        msg: "删除对应收藏失败",
-        data: null,
-        err: err,
-      });
-    } else {
-      res.json({
-        code: "200",
-        msg: "删除对应收藏成功",
-        data: results,
-      });
-    }
-  });
-});
+    connection.query(sql, (err, results) => {
+      if (err) {
+        res.status(500).json({
+          code: "500",
+          msg: "删除对应收藏失败",
+          data: null,
+          err: err,
+        });
+      } else {
+        res.json({
+          code: "200",
+          msg: "删除对应收藏成功",
+          data: results,
+        });
+      }
+    });
+  }
+);
 
 //通过user_id，修改用户信息
-router.post("/updateUserInfo", (req, res) => {
+router.post("/updateUserInfo", checkTokenMiddleware, (req, res) => {
   // 使用商家ID查询对应的菜品
   const user_id = req.body.user_id;
   const data = req.body.data;
@@ -449,7 +458,7 @@ WHERE
 });
 
 //添加收藏
-router.post("/addFavorite", (req, res) => {
+router.post("/addFavorite", checkTokenMiddleware, (req, res) => {
   let user_id = req.body.user_id;
   let restaurant_id = req.body.restaurant_id;
   let fdate = req.body.fdate;
@@ -474,81 +483,117 @@ router.post("/addFavorite", (req, res) => {
   });
 });
 //查询是否收藏
-router.get("/isFavorite/:user_id-:restaurant_id", (req, res) => {
-  let user_id = req.params.user_id;
-  let restaurant_id = req.params.restaurant_id;
+router.get(
+  "/isFavorite/:user_id-:restaurant_id",
+  checkTokenMiddleware,
+  (req, res) => {
+    let user_id = req.params.user_id;
+    let restaurant_id = req.params.restaurant_id;
 
-  var sql = `select * from favorites  where user_id= "${user_id}" AND restaurant_id= "${restaurant_id}"`;
-  // var add_value = [req.body.username, md5(req.body.password), req.body.email];
-  connection.query(sql, function (err, result) {
-    if (err) {
-      res.send({
-        code: "412",
-        msg: "未收藏",
-        data: null,
-        err: err,
-      });
-    } else {
-      res.json({
-        code: "200",
-        msg: "已收藏",
-        data: result,
-      }); //   响应内容 增加数据成功
-    }
-  });
-});
+    var sql = `select * from favorites  where user_id= "${user_id}" AND restaurant_id= "${restaurant_id}"`;
+    // var add_value = [req.body.username, md5(req.body.password), req.body.email];
+    connection.query(sql, function (err, result) {
+      if (err) {
+        res.send({
+          code: "412",
+          msg: "未收藏",
+          data: null,
+          err: err,
+        });
+      } else {
+        res.json({
+          code: "200",
+          msg: "已收藏",
+          data: result,
+        }); //   响应内容 增加数据成功
+      }
+    });
+  }
+);
 //删除收藏
-router.delete("/deleteFavorite/:user_id-:restaurant_id", (req, res) => {
-  console.log(req.params);
-  // 使用商家ID查询对应的菜品
-  let user_id = req.params.user_id;
-  let restaurant_id = req.params.restaurant_id;
-  const sql = `DELETE FROM favorites WHERE user_id="${user_id}" AND restaurant_id="${restaurant_id}"`;
-  connection.query(sql, (err, results) => {
-    if (err) {
-      res.json({
-        code: "500",
-        msg: "删除收藏失败",
-        data: null,
-        err: err,
-      });
-    } else {
-      res.json({
-        code: "200",
-        msg: "删除收藏成功",
-        data: results,
-      });
-    }
-  });
-});
+router.delete(
+  "/deleteFavorite/:user_id-:restaurant_id",
+  checkTokenMiddleware,
+  (req, res) => {
+    console.log(req.params);
+    // 使用商家ID查询对应的菜品
+    let user_id = req.params.user_id;
+    let restaurant_id = req.params.restaurant_id;
+    const sql = `DELETE FROM favorites WHERE user_id="${user_id}" AND restaurant_id="${restaurant_id}"`;
+    connection.query(sql, (err, results) => {
+      if (err) {
+        res.json({
+          code: "500",
+          msg: "删除收藏失败",
+          data: null,
+          err: err,
+        });
+      } else {
+        res.json({
+          code: "200",
+          msg: "删除收藏成功",
+          data: results,
+        });
+      }
+    });
+  }
+);
 
 //查询是否关注
-router.get("/isguanzhu/:user_id-:fan_user_id", (req, res) => {
-  let user_id = req.params.user_id;
-  let fan_user_id = req.params.fan_user_id;
-  var sql = `select * from fans  where user_id= "${user_id}" AND fan_user_id= "${fan_user_id}"`;
-  // var add_value = [req.body.username, md5(req.body.password), req.body.email];
-  connection.query(sql, function (err, result) {
-    if (err) {
-      res.send({
-        code: "412",
-        msg: "未关注",
-        data: null,
-        err: err,
-      });
-    } else {
-      res.json({
-        code: "200",
-        msg: "已关注",
-        data: result,
-      }); //   响应内容 增加数据成功
-    }
-  });
-});
+router.get(
+  "/isguanzhu/:user_id-:fan_user_id",
+  checkTokenMiddleware,
+  (req, res) => {
+    let user_id = req.params.user_id;
+    let fan_user_id = req.params.fan_user_id;
+    var sql = `select * from fans  where user_id= "${user_id}" AND fan_user_id= "${fan_user_id}"`;
+    // var add_value = [req.body.username, md5(req.body.password), req.body.email];
+    connection.query(sql, function (err, result) {
+      if (err) {
+        res.send({
+          code: "412",
+          msg: "未关注",
+          data: null,
+          err: err,
+        });
+      } else {
+        res.json({
+          code: "200",
+          msg: "已关注",
+          data: result,
+        }); //   响应内容 增加数据成功
+      }
+    });
+  }
+);
 //查询关注用户数量
-router.get("/guanzhuNum/:fan_user_id", (req, res) => {
+// router.get("/guanzhuNum/:fan_user_id", (req, res) => {
+//   let fan_user_id = req.params.fan_user_id;
+//   var sql = `select * from fans  where fan_user_id= "${fan_user_id}"`;
+//   // var add_value = [req.body.username, md5(req.body.password), req.body.email];
+//   connection.query(sql, function (err, result) {
+//     if (err) {
+//       res.send({
+//         code: "412",
+//         msg: "查询错误",
+//         data: null,
+//         err: err,
+//       });
+//     } else {
+//       res.json({
+//         code: "200",
+//         msg: "关注数量",
+//         data: result,
+//       }); //   响应内容 增加数据成功
+//     }
+//   });
+// });
+
+//查询关注用户数量
+router.get("/guanzhuNum/:fan_user_id", checkTokenMiddleware, (req, res) => {
   let fan_user_id = req.params.fan_user_id;
-  var sql = `select * from fans  where fan_user_id= "${fan_user_id}"`;
+  var sql = ` SELECT u.user_id, u.username, u.avatar_url FROM fans JOIN users u ON fans.user_id = u.user_id WHERE fans.fan_user_id = ${fan_user_id};
+  `;
   // var add_value = [req.body.username, md5(req.body.password), req.body.email];
   connection.query(sql, function (err, result) {
     if (err) {
@@ -568,9 +613,9 @@ router.get("/guanzhuNum/:fan_user_id", (req, res) => {
   });
 });
 //查询粉丝数量
-router.get("/fansNum/:user_id", (req, res) => {
+router.get("/fansNum/:user_id", checkTokenMiddleware, (req, res) => {
   let user_id = req.params.user_id;
-  var sql = `select * from fans  where user_id= "${user_id}"`;
+  var sql = `SELECT u.user_id, u.username, u.avatar_url FROM fans JOIN users u ON fans.fan_user_id = u.user_id WHERE fans.user_id = ${user_id};`;
   // var add_value = [req.body.username, md5(req.body.password), req.body.email];
   connection.query(sql, function (err, result) {
     if (err) {
@@ -590,7 +635,7 @@ router.get("/fansNum/:user_id", (req, res) => {
   });
 });
 //关注其他用户
-router.post("/guanzhu", (req, res) => {
+router.post("/guanzhu", checkTokenMiddleware, (req, res) => {
   let user_id = req.body.user_id;
   let fan_user_id = req.body.fan_user_id;
   var sql = `insert into fans set user_id="${user_id}" , fan_user_id="${fan_user_id}"`;
@@ -615,27 +660,31 @@ router.post("/guanzhu", (req, res) => {
 });
 
 //取消关注
-router.delete("/deleteGuanzhu/:user_id-:fan_user_id", (req, res) => {
-  console.log(req.params);
-  // 使用商家ID查询对应的菜品
-  let user_id = req.params.user_id;
-  let fan_user_id = req.params.fan_user_id;
-  const sql = `DELETE FROM fans WHERE user_id="${user_id}" AND fan_user_id="${fan_user_id}"`;
-  connection.query(sql, (err, results) => {
-    if (err) {
-      res.json({
-        code: "500",
-        msg: "取消关注失败",
-        data: null,
-        err: err,
-      });
-    } else {
-      res.json({
-        code: "200",
-        msg: "取消关注成功",
-        data: results,
-      });
-    }
-  });
-});
+router.delete(
+  "/deleteGuanzhu/:user_id-:fan_user_id",
+  checkTokenMiddleware,
+  (req, res) => {
+    console.log(req.params);
+    // 使用商家ID查询对应的菜品
+    let user_id = req.params.user_id;
+    let fan_user_id = req.params.fan_user_id;
+    const sql = `DELETE FROM fans WHERE user_id="${user_id}" AND fan_user_id="${fan_user_id}"`;
+    connection.query(sql, (err, results) => {
+      if (err) {
+        res.json({
+          code: "500",
+          msg: "取消关注失败",
+          data: null,
+          err: err,
+        });
+      } else {
+        res.json({
+          code: "200",
+          msg: "取消关注成功",
+          data: results,
+        });
+      }
+    });
+  }
+);
 module.exports = router;

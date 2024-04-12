@@ -81,7 +81,7 @@
                 class="detail-dish-box"
               >
                 <img :src="item.image_url" alt="" class="detail-dish-img" />
-                <div>{{ item.name }}</div>
+                <div class="detail-dish-name">{{ item.name }}</div>
                 <div class="detail-dish-price" v-if="item.price">
                   ￥{{ item.price }}
                 </div>

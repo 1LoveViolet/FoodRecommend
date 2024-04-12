@@ -161,6 +161,7 @@ export default {
     };
   },
   created() {
+    console.log("用户token", this.$store.state.token);
     if (this.$store.state.user) {
       this.user = this.$store.state.user[0];
       getAvatar(this.$store.state.user[0].user_id).then((res) => {

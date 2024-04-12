@@ -3,7 +3,7 @@ var router = express.Router();
 const connection = require("../dataBase/db"); // 获取连接实例
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
-
+const checkTokenMiddleware = require("../middlewares/checkTokenMiddleware");
 // 假设已有数据库连接池 connection，如果没有，需要先配置数据库连接
 
 //全查商家
@@ -325,7 +325,7 @@ router.get("/searchRestaurantInfoById/:id", (req, res) => {
   });
 });
 //添加评论
-router.post("/addReview", (req, res) => {
+router.post("/addReview", checkTokenMiddleware, (req, res) => {
   const restaurant_id = req.body.restaurant_id;
   const user_id = req.body.user_id;
   const rating = req.body.rating;

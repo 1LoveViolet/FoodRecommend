@@ -23,8 +23,8 @@
           <div class="menu-item-user-content">
             <div class="username" @click="userClick()">{{ user.username }}</div>
             <div class="fansandreview">
-              <div class="fansnum">粉丝：6</div>
-              <div class="reviewnum">评论：7</div>
+              <div class="fansnum">粉丝：{{ this.guanzhunum }}</div>
+              <div class="reviewnum">评论：{{ this.fansnum }}</div>
             </div>
             <div @click="loginOut" class="loginOut">退出</div>
           </div>
@@ -35,7 +35,7 @@
       </div>
       <div class="nav-item-menu">
         <div class="nav-item">
-          <div @click="toUser">个人中心</div>
+          <div @click="toUser()">个人中心</div>
         </div>
         <div class="menu-item">
           <div @click="toContent1">个人信息</div>
@@ -67,7 +67,7 @@
 
 <script>
 import $ from "jquery";
-import { getAvatar } from "api/user";
+import { getAvatar, guanzhuNum, fansNum } from "api/user";
 import MapLoader from "unti/unti";
 export default {
   components: {},
@@ -80,6 +80,8 @@ export default {
       index3: 2,
       index4: 3,
       positionCity: null,
+      guanzhunum: null,
+      fansnum: null,
     };
   },
   created() {
@@ -100,6 +102,9 @@ export default {
       .catch((error) => {
         console.error("发生错误", error);
       });
+
+    this.getgaunzhunum();
+    this.getfansnum();
   },
   mounted() {
     // $(".menu-item").css("display", "flex");
@@ -129,7 +134,24 @@ export default {
       });
     }
   },
+  watch: {
+    $route(to, from) {
+      this.$router.go(0);
+    },
+  },
   methods: {
+    getgaunzhunum() {
+      guanzhuNum(this.$store.state.user[0].user_id).then((res) => {
+        console.log("header获取关注数量", res);
+        this.guanzhunum = res.data.length;
+      });
+    },
+    getfansnum() {
+      fansNum(this.$store.state.user[0].user_id).then((res) => {
+        console.log("header获取粉丝数量", res);
+        this.fansnum = res.data.length;
+      });
+    },
     toHome() {
       this.$router.go(0);
     },
@@ -149,7 +171,7 @@ export default {
       const newhref = this.$router.resolve({
         path: "/user",
         name: "user",
-        query: { id: this.user.user_id },
+        query: { id: this.$store.state.user[0].user_id },
       });
 
       window.open(newhref.href, "_blank");
@@ -160,7 +182,7 @@ export default {
           path: "/user",
           query: {
             //query是个配置项
-            id: this.user.user_id,
+            id: this.$store.state.user[0].user_id,
           },
         })
         .then((res) => {
@@ -177,7 +199,7 @@ export default {
           path: "/user",
           query: {
             //query是个配置项
-            id: this.user.user_id,
+            id: this.$store.state.user[0].user_id,
           },
         })
         .then((res) => {
@@ -194,7 +216,7 @@ export default {
           path: "/user",
           query: {
             //query是个配置项
-            id: this.user.user_id,
+            id: this.$store.state.user[0].user_id,
           },
         })
         .then((res) => {
@@ -211,7 +233,7 @@ export default {
           path: "/user",
           query: {
             //query是个配置项
-            id: this.user.user_id,
+            id: this.$store.state.user[0].user_id,
           },
         })
         .then((res) => {
@@ -228,11 +250,13 @@ export default {
       });
     },
     toUser() {
+      console.log("点击跳转个人中心");
+      console.log("", this.$store.state.user[0].user_id);
       this.$router.push({
         path: "/user",
         query: {
           //query是个配置项
-          id: this.user.user_id,
+          id: this.$store.state.user[0].user_id,
         },
       });
     },

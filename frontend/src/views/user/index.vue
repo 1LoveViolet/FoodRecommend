@@ -14,6 +14,7 @@
                 deleteguanzhu: isguanzhu == true,
               }"
               @click="guanzhuBtn"
+              v-if="this.$store.state.user[0].user_id != this.user.user_id"
             >
               {{ this.guanzhuMsg }}
             </div>
@@ -56,17 +57,17 @@
           <div class="lside">
             <div class="lside-tabbox">
               <div class="lside-tabbox-item">
-                <div>关注</div>
-                <div>{{ this.guanzhunum }}</div>
+                <div @click="showguanzhu">关注</div>
+                <div @click="showguanzhu">{{ this.guanzhunum }}</div>
               </div>
               <div class="lside-tabbox-item">
-                <div>粉丝</div>
-                <div>{{ this.fansnum }}</div>
+                <div @click="showfans">粉丝</div>
+                <div @click="showfans">{{ this.fansnum }}</div>
               </div>
-              <div class="lside-tabbox-item">
+              <!-- <div class="lside-tabbox-item">
                 <div>获赞</div>
                 <div>0</div>
-              </div>
+              </div> -->
             </div>
             <div class="lside-time">性别：{{ user.sex }}</div>
             <div class="lside-time">邮箱：{{ user.email }}</div>
@@ -136,7 +137,11 @@
                 <div class="cur-date">
                   发表于:{{ dayjs(item.date).format("YYYY-MM-DD") }}
                 </div>
-                <div class="cur-delete" @click="deleteRV(item.review_id)">
+                <div
+                  class="cur-delete"
+                  @click="deleteRV(item.review_id)"
+                  v-if="$store.state.user[0].user_id == item.user_id"
+                >
                   删除
                 </div>
               </div>
@@ -332,6 +337,47 @@
             </el-upload>
           </div>
         </div>
+        <div class="guanzhuANDfans" v-if="showguanzhuANDfans">
+          <div class="guanzhuANDfans-header">
+            <div @click="showguanzhu">关注({{ this.guanzhunum }})</div>
+            <div class="line">|</div>
+            <div @click="showfans">粉丝({{ this.fansnum }})</div>
+          </div>
+          <div v-if="showguanzhuANDfans && showGuanzhu">
+            <el-empty
+              description="暂时还没有人关注你哦"
+              v-if="guanzhuData.length == 0"
+            ></el-empty>
+            <div class="guanzhu-content">
+              <div
+                v-for="(item, index) in guanzhuData"
+                :key="index"
+                class="userItem"
+                @click="toUserDetail(item.user_id)"
+              >
+                <img :src="item.avatar_url" alt="" />
+                <div class="userItem-name">{{ item.username }}</div>
+              </div>
+            </div>
+          </div>
+          <div v-if="showguanzhuANDfans && showFans">
+            <el-empty
+              description="暂时还没有人关注你哦"
+              v-if="fansData.length == 0"
+            ></el-empty>
+            <div class="fans-content">
+              <div
+                v-for="(item, index) in fansData"
+                :key="index"
+                class="userItem"
+                @click="toUserDetail(item.user_id)"
+              >
+                <img :src="item.avatar_url" alt="" />
+                <div class="userItem-name">{{ item.username }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <myfooter></myfooter>
@@ -339,6 +385,7 @@
 </template>
 
 <script>
+import store from "../../store/index";
 const myheader = () => import("components/header/index.vue");
 const myfooter = () => import("components/footer/index.vue");
 import {
@@ -390,6 +437,11 @@ export default {
       guanzhuMsg: "+关注",
       guanzhunum: null,
       fansnum: null,
+      guanzhuData: null,
+      fansData: null,
+      showguanzhuANDfans: false,
+      showGuanzhu: false,
+      showFans: false,
     };
   },
   created() {
@@ -408,14 +460,48 @@ export default {
     this.$bus.$on("toContent4", this.toContent4);
   },
   methods: {
+    toUserDetail(id) {
+      const newhref = this.$router.resolve({
+        path: "/user",
+        name: "user",
+        query: { id: id },
+        // params: this.goodsItem.restaurant_id,
+      });
+
+      window.open(newhref.href, "_blank");
+    },
+    showguanzhu() {
+      console.log("点击关注");
+      this.showguanzhuANDfans = true;
+      this.showGuanzhu = true;
+      this.showFans = false;
+      this.currentindex = -1;
+      console.log("this.showguanzhuANDfans", this.showguanzhuANDfans);
+      console.log("this.showGuanzhu", this.showGuanzhu);
+    },
+    showfans() {
+      console.log("点击粉丝");
+      this.showguanzhuANDfans = true;
+      this.showFans = true;
+      this.showGuanzhu = false;
+      this.currentindex = -1;
+      console.log("this.showguanzhuANDfans", this.showguanzhuANDfans);
+      console.log("this.showFans", this.showFans);
+    },
     getgaunzhunum() {
       guanzhuNum(this.user.user_id).then((res) => {
         console.log("获取关注数量", res);
+        this.guanzhunum = res.data.length;
+        this.guanzhuData = res.data;
+        console.log("关注数据", this.guanzhuData);
       });
     },
     getfansnum() {
       fansNum(this.user.user_id).then((res) => {
         console.log("获取粉丝数量", res);
+        this.fansnum = res.data.length;
+        this.fansData = res.data;
+        console.log("粉丝数据", this.fansData);
       });
     },
     guanzhuBtn() {
@@ -537,6 +623,7 @@ export default {
       });
     },
     deleteRV(review_id) {
+      console.log("点击删除的this", this.$store);
       this.$confirm("此操作将永久删除该数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
