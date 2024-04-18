@@ -62,11 +62,11 @@ router.beforeEach((to, from, next) => {
   const token = router.app.$store.state.token;
 
   if (
-    to.path === "/login" ||
-    to.path === "/register" ||
-    to.path === "/home" ||
-    to.path === "/detail" ||
-    to.path === "/"
+    to.path == "/login" ||
+    to.path == "/register" ||
+    to.path == "/home" ||
+    to.path == "/detail" ||
+    to.path == "/"
   ) {
     // 如果是登录或注册页面，直接允许访问
     next();

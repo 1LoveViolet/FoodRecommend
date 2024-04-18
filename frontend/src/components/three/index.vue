@@ -959,15 +959,7 @@ export default {
       if (!this.noclick) {
         this.noclick = false;
         this.raycaster.setFromCamera(this.mouse, this.camera);
-        // const mapChildren = scene.children.filter((item) => {
-        //   // console.log(item.geometry);
-        //   item.type == "Mesh";
-        // });
-        // console.log(meshArr);
-        const mapChildren = this.scene.children.filter((item) => {
-          // console.log(item);
-          // item.type == "Mesh";
-        });
+        const mapChildren = this.scene.children.filter((item) => {});
         // 被射线照射到的一组对象
         var intersects = this.raycaster.intersectObjects(this.meshArr);
         // console.log(intersects);
@@ -985,27 +977,22 @@ export default {
               this.INTERSECTED.material.color.setHex(
                 this.INTERSECTED.currentHex
               );
-              // INTERSECTED.position.z = 0;
             }
             // 设置当前选中的物体
             this.INTERSECTED = intersects[0].object;
             // 保留当前选中物体，**原本的颜色**
             this.INTERSECTED.currentHex =
               this.INTERSECTED.material.color.getHex();
-            // console.log(INTERSECTED.currentHex);
             // 设置当前选中的物体颜色为红色
             this.INTERSECTED.material.color.setHex(0xff0000);
-            // INTERSECTED.position.z = 3;
           }
           // 如果没有相交的物体，把选中的物体设置为原来的颜色
         } else {
           if (this.INTERSECTED) {
             this.INTERSECTED.material.color.setHex(this.INTERSECTED.currentHex);
-            // INTERSECTED.position.z = 0;
           }
           // 清空选中物体
           tooltip.style.display = "none";
-
           this.INTERSECTED = null;
         }
       }

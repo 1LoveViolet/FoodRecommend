@@ -339,9 +339,13 @@
         </div>
         <div class="guanzhuANDfans" v-if="showguanzhuANDfans">
           <div class="guanzhuANDfans-header">
-            <div @click="showguanzhu">关注({{ this.guanzhunum }})</div>
+            <div @click="showguanzhu" :class="{ guanzhuClass: showGuanzhu }">
+              关注({{ this.guanzhunum }})
+            </div>
             <div class="line">|</div>
-            <div @click="showfans">粉丝({{ this.fansnum }})</div>
+            <div @click="showfans" :class="{ fanClass: showFans }">
+              粉丝({{ this.fansnum }})
+            </div>
           </div>
           <div v-if="showguanzhuANDfans && showGuanzhu">
             <el-empty
@@ -572,6 +576,7 @@ export default {
     },
     tabItenClick(index) {
       this.currentindex = index;
+      this.showguanzhuANDfans = false;
       // switch (index) {
       //   case 0:
       //     this.currentindex = "首页";

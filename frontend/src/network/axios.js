@@ -2,7 +2,7 @@ import originAxios from "axios";
 import qs from "qs";
 import store from "../store/index";
 export default function axios(option) {
-  // originAxios.defaults.withCredentials = true;
+  originAxios.defaults.withCredentials = true;
   return new Promise((resolve, reject) => {
     // 1.创建axios的实例
     const instance = originAxios.create({

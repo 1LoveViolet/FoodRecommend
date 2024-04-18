@@ -143,6 +143,7 @@ export default {
       input: null,
       categoryList: [],
       cuisineList: [],
+      buxianCategory: null,
       showGoods: [],
       currentType: null,
       pagegoodList: [],
@@ -632,6 +633,7 @@ export default {
       searchRestaurantCuisine(canshu).then((res) => {
         let ArrCuisine = this.uniqueFunc(res.data, "cuisine");
         this.cuisineList = [];
+        this.cuisineList.push("不限");
         ArrCuisine.forEach((item) => {
           this.cuisineList.push(item.cuisine);
         });
@@ -644,6 +646,7 @@ export default {
       this.currentType = item;
       console.log("this.currentType:  ", this.currentType);
       this.$refs.tabControl2.currentIndex = index;
+      this.buxianCategory = item;
       this.getCuisine(this.currentType);
       if (this.currentType == "不限") {
         this.getAllRestaurantInfo();
@@ -661,7 +664,13 @@ export default {
       this.currentType = item;
       console.log("this.currentType:  ", this.currentType);
       this.$refs.tabControl3.currentIndex = index;
-      this.getRestaurantInfoByCuisine();
+      if (this.currentType == "不限") {
+        this.currentType = this.buxianCategory;
+        this.getRestaurantInfoByCategory();
+      } else {
+        this.getRestaurantInfoByCuisine();
+      }
+      // this.getRestaurantInfoByCuisine();
       if (this.$refs.goodList) {
         this.$refs.goodList.currentPage = 1;
         this.$refs.goodList.getPageInfoClick();
