@@ -15,6 +15,7 @@ let checkTokenMiddleware = (req, res, next) => {
   //检验token
   jwt.verify(token, "token", (err, data) => {
     if (err) {
+      console.log(err);
       res.json({
         code: "2003",
         msg: "token 校验失败",

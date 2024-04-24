@@ -480,23 +480,23 @@ export default {
       });
 
       // 如果 rating 或 price_range 差距到达阈值，特殊处理
-      shops.forEach((shop) => {
-        shops.forEach((otherShop) => {
-          if (shop.id !== otherShop.id) {
-            const ratingDifference = Math.abs(shop.rating - otherShop.rating);
-            const priceRangeDifference = Math.abs(
-              shop.price_range - otherShop.price_range
-            );
-            if (
-              ratingDifference >= ratingThreshold &&
-              priceRangeDifference >= priceRangeThreshold
-            ) {
-              // 对于 rating 或 price_range 差距到达阈值的商家，权重加上一个固定值
-              shop.weight += 0;
-            }
-          }
-        });
-      });
+      // shops.forEach((shop) => {
+      //   shops.forEach((otherShop) => {
+      //     if (shop.id !== otherShop.id) {
+      //       const ratingDifference = Math.abs(shop.rating - otherShop.rating);
+      //       const priceRangeDifference = Math.abs(
+      //         shop.price_range - otherShop.price_range
+      //       );
+      //       if (
+      //         ratingDifference >= ratingThreshold &&
+      //         priceRangeDifference >= priceRangeThreshold
+      //       ) {
+      //         // 对于 rating 或 price_range 差距到达阈值的商家，权重加上一个固定值
+      //         shop.weight += 0;
+      //       }
+      //     }
+      //   });
+      // });
 
       // 按照权重值和名称排序
       shops.sort((a, b) => {

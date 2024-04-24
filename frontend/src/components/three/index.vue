@@ -160,9 +160,9 @@ export default {
     };
   },
   created() {
+    this.getGeoJson(100000);
     this.searchUserByIdmethod();
     this.getAllRestaurantInfo();
-    this.getGeoJson(100000);
   },
   mounted() {
     // this.stats = new Stats();
@@ -891,7 +891,7 @@ export default {
       this.scene = new THREE.Scene();
       //给场景添加烟雾效果
       // 参数：烟雾颜色，烟雾范围near，烟雾范围far
-      // scene.background = new THREE.Color(0x111111);
+      this.scene.background = new THREE.Color(0x203d4e);
       this.scene.fog = new THREE.Fog(0x000000, 0, 3000);
       // 给场景添加坐标轴
       // var axes = new THREE.AxesHelper(100);
@@ -1175,7 +1175,7 @@ export default {
         }
       }
 
-      line.geometry.attributes.color.needsUpdate = true; // 更新颜色
+      // line.geometry.attributes.color.needsUpdate = true; // 更新颜色
     },
     fn(geoJson) {
       //原理：使用静态成员
@@ -1255,8 +1255,8 @@ export default {
         x: (this.mapSideInfo.maxlon + this.mapSideInfo.minlon) / 2,
         y: (this.mapSideInfo.maxlat + this.mapSideInfo.minlat) / 2,
       };
-      // 设置地图中点为北京
-      // centerPos = {
+      //设置地图中点为北京;
+      // this.centerPos = {
       //   x: 116.41995,
       //   y: 40.18994,
       // };

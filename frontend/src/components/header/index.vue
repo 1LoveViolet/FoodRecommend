@@ -51,7 +51,7 @@
         <div>商务服务</div>
       </div>
       <div class="nav-item">
-        <div @click="toRank">美食排行</div>
+        <div @click="toRank">可视化</div>
       </div>
       <div class="nav-item">
         <div>帮助中心</div>

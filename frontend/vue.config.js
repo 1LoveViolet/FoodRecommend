@@ -1,5 +1,10 @@
 const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
+  devServer: {
+    client: {
+      overlay: false,
+    },
+  },
   transpileDependencies: true,
   configureWebpack: {
     resolve: {
@@ -19,6 +24,9 @@ module.exports = defineConfig({
   // 关闭语法检查
   lintOnSave: false,
   devServer: {
+    client: {
+      overlay: false,
+    },
     proxy: {
       "/geo": {
         // 请求的代称，写在Axios里的BaseUrl
