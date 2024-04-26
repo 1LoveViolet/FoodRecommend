@@ -48,6 +48,9 @@ export default {
       user: {},
     };
   },
+  created() {
+    document.title = "登录";
+  },
   mounted() {
     // console.log('userId: ' + this.$store.state.user.userId)
     // console.log('userId: ' + this.$store.state.user.userName)

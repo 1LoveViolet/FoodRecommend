@@ -29,6 +29,7 @@ export default {
   },
   created() {
     this.forceRerender();
+    document.title = `可视化`;
   },
   methods: {
     forceRerender() {

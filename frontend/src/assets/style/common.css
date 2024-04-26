@@ -63,7 +63,8 @@ body {
 
 .nav {
     /* width: 768px; */
-    width: 880px;
+    /* width: 880px; */
+    width: 725px;
     height: 70px;
     margin-top: 8px;
 }

@@ -22,6 +22,9 @@ export default {
     mycontent,
     // goodsList,
   },
+  created() {
+    document.title = `首页`;
+  },
 };
 </script>
 

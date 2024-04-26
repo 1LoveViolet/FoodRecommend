@@ -47,15 +47,15 @@
       <div class="nav-item">
         <div @click="toHome">美食首页</div>
       </div>
-      <div class="nav-item">
+      <!-- <div class="nav-item">
         <div>商务服务</div>
-      </div>
+      </div> -->
       <div class="nav-item">
         <div @click="toRank">可视化</div>
       </div>
-      <div class="nav-item">
+      <!-- <div class="nav-item">
         <div>帮助中心</div>
-      </div>
+      </div> -->
 
       <!-- <div class="nav-item">
         <a href="./commonProblem.html">常见问题</a>
@@ -265,7 +265,7 @@ export default {
 </script>
 
 <style src="@/assets/style/common.css"  scoped></style>
-<style src="@/assets/style/mobileCommon.css"  scoped></style>
+<!-- <style src="@/assets/style/mobileCommon.css"  scoped></style> -->
 <!-- <style scoped>
 @import "@/assets/style/common.css";
 </style> -->

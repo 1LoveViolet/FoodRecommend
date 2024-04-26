@@ -87,6 +87,9 @@ export default {
       },
     };
   },
+  created() {
+    document.title = "注册";
+  },
   methods: {
     sendMsg() {
       this.$refs.FormData.validateField("email", (valid) => {

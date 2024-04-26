@@ -252,6 +252,9 @@ export default {
         legend: {
           orient: "vertical",
           left: "left",
+          textStyle: {
+            color: "#ffffff",
+          },
         },
         series: [
           {
@@ -410,6 +413,9 @@ export default {
             data: this.nameArr,
 
             axisLabel: {
+              textStyle: {
+                color: "#ffffff",
+              },
               interval: 0,
               formatter: function (value) {
                 return value.split("").join("\n");
@@ -420,6 +426,11 @@ export default {
         yAxis: [
           {
             type: "value",
+            axisLabel: {
+              textStyle: {
+                color: "#ffffff",
+              },
+            },
           },
         ],
         series: [
@@ -892,6 +903,7 @@ export default {
       //给场景添加烟雾效果
       // 参数：烟雾颜色，烟雾范围near，烟雾范围far
       this.scene.background = new THREE.Color(0x203d4e);
+      // this.scene.background = new THREE.Color(0xffffff);
       this.scene.fog = new THREE.Fog(0x000000, 0, 3000);
       // 给场景添加坐标轴
       // var axes = new THREE.AxesHelper(100);
@@ -1291,9 +1303,7 @@ export default {
       return pointsArray;
     },
     addmesh(lonlatArr) {
-      // console.log(lonlatArr);
       const shap = this.drawPlan(lonlatArr);
-
       // 几何体
       const geo = new THREE.ExtrudeGeometry(shap, this.extrudeSettings);
       geo.rotateX(Math.PI);
@@ -1308,12 +1318,7 @@ export default {
         opacity: 0.5,
         side: THREE.DoubleSide,
       });
-      // material.backup = material.color.getHex();
-      // 物体
       const mesh = new THREE.Mesh(geo, material);
-      // 获取顶点数组
-      // var vertices = geo.getAttribute("position").array;
-      // console.log("获取顶点数组vertices", vertices);
       return mesh;
     },
     addLine(lonlatArr) {

@@ -621,6 +621,7 @@ export default {
         this.isHaveguanzhu();
         this.getgaunzhunum();
         this.getfansnum();
+        document.title = `${this.user.username}的个人页面`;
         console.log("this.pageReviewList:", this.pageReviewList);
         console.log("this.user: ", this.user);
         console.log("this.favorites: ", this.favorites);

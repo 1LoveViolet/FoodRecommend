@@ -273,6 +273,7 @@ export default {
         }
       });
       this.initIsFavorite();
+      document.title = `${this.restaurantInfo[0].name}`;
     });
     console.log("detail中的dishList: ", this.dishList);
     console.log("detail中的restaurantInfo: ", this.restaurantInfo);

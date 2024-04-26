@@ -19,10 +19,7 @@
       <div class="rectangle-4"></div>
       <div class="copyright-and-business-license">
         ©2023 版权所有 xxxx
-        <a
-          href="https://beian.miit.gov.cn"
-          class="copyright-and-business-license-a2"
-          target="_blank"
+        <a href="" class="copyright-and-business-license-a2" target="_blank"
           >蜀ICP备12345678号-5</a
         >
       </div>
